@@ -11,22 +11,6 @@ CONFIG_DIR="$HOME/.cfg"
 BACKUP_DIR="$HOME/.config-backup"
 CONFIG_ALIAS="config"
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -h|--help)
-            echo "Usage: $0"
-            echo "  -h, --help: Show this help message"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Use -h or --help for usage information"
-            exit 1
-            ;;
-    esac
-done
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -261,39 +245,34 @@ configure_repo() {
 }
 
 # Main setup function
-main() {
-    log_info "Starting dotfiles setup..."
+log_info "Starting dotfiles setup..."
+echo
+
+# Check prerequisites
+check_git
+
+# Clone repository
+clone_repo
+
+# Setup config alias for this session
+setup_config_alias
+
+# Handle conflicting files and checkout
+if ! config checkout 2>/dev/null; then
+    backup_conflicting_files
+    checkout_dotfiles
+else
+    log_success "Dotfiles checked out successfully with no conflicts."
+fi
+
+# Configure repository
+configure_repo
+
+echo
+log_success "Dotfiles setup completed successfully!"
+log_info "Restart your shell or run 'source ~/.bashrc' or 'source ~/.zshrc' to use the '$CONFIG_ALIAS' alias."
+
+if [ -d "$BACKUP_DIR" ] && [ "$(find "$BACKUP_DIR" -type f | wc -l)" -gt 0 ]; then
     echo
-
-    # Check prerequisites
-    check_git
-
-    # Clone repository
-    clone_repo
-
-    # Setup config alias for this session
-    setup_config_alias
-
-    # Handle conflicting files and checkout
-    if ! config checkout 2>/dev/null; then
-        backup_conflicting_files
-        checkout_dotfiles
-    else
-        log_success "Dotfiles checked out successfully with no conflicts."
-    fi
-
-    # Configure repository
-    configure_repo
-
-    echo
-    log_success "Dotfiles setup completed successfully!"
-    log_info "Restart your shell or run 'source ~/.bashrc' or 'source ~/.zshrc' to use the '$CONFIG_ALIAS' alias."
-
-    if [ -d "$BACKUP_DIR" ] && [ "$(find "$BACKUP_DIR" -type f | wc -l)" -gt 0 ]; then
-        echo
-        log_info "Backed up files are available in: $BACKUP_DIR"
-    fi
-}
-
-# Run main function
-main "$@"
+    log_info "Backed up files are available in: $BACKUP_DIR"
+fi
