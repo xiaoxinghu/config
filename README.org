@@ -1,0 +1,12 @@
+#+title: System Configuration
+
+* 🌱 System Config
+
+My personal dotfiles, managed using a **bare Git repository** for a clean `$HOME` and portable configuration.
+
+
+** ⚒️ Setup
+
+#+begin_src sh
+curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/config/refs/heads/main/bin/setup.sh | bash
+#+end_src
