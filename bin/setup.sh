@@ -5,11 +5,12 @@ set -e
 REPO_URL="git@github.com:xiaoxinghu/config.git"
 BARE_DIR="$HOME/.cfg"
 
+config() {
+  /usr/bin/git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"
+}
+
 echo "📦 Cloning bare repository into $BARE_DIR..."
 git clone --bare "$REPO_URL" "$BARE_DIR"
-
-echo "🔧 Setting up temporary config alias..."
-eval "alias config='/usr/bin/git --git-dir=\$HOME/.cfg/ --work-tree=\$HOME'"
 
 echo "📁 Checking out dotfiles..."
 config checkout 2>checkout_errors.log || {
