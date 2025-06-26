@@ -57,3 +57,11 @@ GITSTATUS_LOG_LEVEL=DEBUG
 
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
+
+# --- plugins ---
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+
+# --- key binds ---
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
