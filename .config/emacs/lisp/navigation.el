@@ -97,6 +97,7 @@
   )
 
 (use-package corfu
+	:disabled (featurep 'lsp-bridge)
   :custom
   (corfu-cycle t)
   (corfu-auto t)
