@@ -97,7 +97,7 @@
   )
 
 (use-package corfu
-	:disabled (featurep 'lsp-bridge)
+	;; :disabled (featurep 'lsp-bridge)
   :custom
   (corfu-cycle t)
   (corfu-auto t)
@@ -292,7 +292,7 @@
 
 
 (use-package bookmark+
-  :vc (:fetcher github :repo emacsmirror/bookmark-plus)
+  :vc (:url "https://github.com/emacsmirror/bookmark-plus" :rev :newest)
   :config
   (defhydra hydra-bm (:hint nil)
     "Bookmarks"
@@ -306,6 +306,7 @@
   )
 
 (use-package avy
+	;; :disabled t
   :config
   (evil-define-key nil 'global
 		(kbd "<leader> SPC") 'avy-goto-char-timer))

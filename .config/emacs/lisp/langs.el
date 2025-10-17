@@ -12,7 +12,6 @@
 (use-package web-mode
   :mode (("\\.html?\\'" . web-mode)
          ("\\.css\\'"   . web-mode)
-         ("\\.svelte\\'"   . svelte-mode)
          ;; ("\\.[t|j]sx\\'"  . jsx-mode)
          )
   :custom
@@ -20,14 +19,13 @@
   (web-mode-css-indent-offset 2)
   (web-mode-code-indent-offset 2)
   (web-mode-script-padding 2)
+  (css-indent-offset 2)
 	:hook (web-mode . my/web-mode-hook)
   :config
 	;; (web-mode-use-tabs)
   ;; https://github.com/emacs-typescript/typescript.el/issues/4#issuecomment-947866123
   (define-derived-mode jsx-mode web-mode "jsx")
   (setq web-mode-content-types-alist '(("jsx" . "\\.js[x]?\\'")))
-  (define-derived-mode svelte-mode web-mode "svelte")
-  ;; (setq web-mode-content-types-alist '(("svelte" . "\\.svelte\\'")))
   (with-eval-after-load 'lsp-mode
     (add-to-list 'lsp--formatting-indent-alist '(jsx-mode . js-indent-level)))
 	)
@@ -42,6 +40,11 @@
 (setq auto-mode-alist
       (append '((".*\\.astro\\'" . astro-mode))
               auto-mode-alist))
+
+(use-package svelte-ts-mode
+	;; :after eglot
+	:mode "\\.svelte\\'"
+	:vc (:url "https://github.com/leafOfTree/svelte-ts-mode" :rev :newest))
 
 (use-package json-mode
   :mode "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"

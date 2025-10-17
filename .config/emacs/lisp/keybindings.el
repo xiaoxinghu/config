@@ -32,6 +32,12 @@
 (use-package evil-commentary
   :config (evil-commentary-mode 1))
 
+(use-package evil-snipe
+	:config
+  (evil-snipe-mode 1)
+  (evil-snipe-override-mode 1)
+	(add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode))
+
 (evil-set-leader 'normal (kbd "SPC"))
 (evil-set-leader 'normal (kbd ",") t)
 
@@ -64,6 +70,7 @@
   (kbd "M-r") 'revert-buffer-quick
   (kbd "M-0") (lambda () (interactive) (text-scale-set 0))
   (kbd "M-n") 'xah-new-empty-buffer
+  (kbd "M-`") 'evil-switch-to-windows-last-buffer
   )
 
 (evil-define-key 'normal 'global
@@ -77,6 +84,7 @@
 (defhydra hydra-file (:hint nil)
   "Files"
   ("f" find-file "find file" :color blue)
+  ("y" yank-location "yank location" :color blue)
   ("r" consult-recent-file "recent files" :color blue)
   ("c" (find-file (expand-file-name "init.el" user-emacs-directory)) "open config" :color blue)
   ("R" my/reload-config "reload config" :color blue)

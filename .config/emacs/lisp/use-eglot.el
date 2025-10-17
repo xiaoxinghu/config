@@ -3,6 +3,7 @@
   :hook
   ((
     typescript-mode
+    tsx-ts-mode
     web-mode
     js2-mode
     js-mode
@@ -12,10 +13,18 @@
     typescript-ts-mode
     yaml-ts-mode
     svelte-mode
+    svelte-ts-mode
+    c-ts-mode
+    c++-ts-mode
+    c-or-c++-ts-mode
     ) . eglot-ensure)
   :custom
   (eglot-confirm-server-initiated-edits nil)
   :config
+	;; keybinds
+	(evil-define-key 'normal 'global (kbd "M-.") 'eglot-code-action-quickfix)
+	(define-key evil-normal-state-map "gi" 'eglot-find-implementation)
+
   (defun my/eglot-organize-imports ()
     (interactive)
     (if (derived-mode-p major-mode #'typescript-ts-base-mode)
@@ -37,21 +46,35 @@
 
   (add-to-list
    'eglot-server-programs
-   `(astro-mode . ("astro-ls" "--stdio" :initializationOptions (:typescript (:tsdk ,my/typescript-path)))))
+   `(astro-mode . ("astro-ls" "--stdio")))
 
-  (add-to-list 'eglot-server-programs
-               '(svelte-mode . ("svelteserver" "--stdio")))
+	(add-to-list 'eglot-server-programs '(svelte-ts-mode . ("svelteserver" "--stdio")))
 
   (add-to-list 'eglot-server-programs
                '(markdown-mode . ("remark-language-server" "--stdio")))
 
-  (defclass eglot-deno (eglot-lsp-server) ()
-    :documentation "A custom class for deno lsp.")
+  ;; (defclass eglot-deno (eglot-lsp-server) ()
+  ;;   :documentation "A custom class for deno lsp.")
 
-  (cl-defmethod eglot-initialization-options ((server eglot-deno))
-    "Passes through required deno initialization options"
-    (list :enable t
-          :lint t :unstable t))
+  ;; (cl-defmethod eglot-initialization-options ((server eglot-deno))
+  ;;   "Passes through required deno initialization options"
+  ;;   (list :enable t
+  ;;         :lint t :unstable t))
+
+	;; deno.documentPreloadLimit
+	;; (cl-defmethod eglot-initialization-options ((server eglot-deno))
+  ;;   "Passes through required deno initialization options"
+  ;;   (list
+  ;;    :enable t
+  ;;    :unstable t
+	;; 	 :deno
+	;; 	 (:documentPreloadLimit 10000)
+  ;;    :typescript
+  ;;    (:inlayHints
+  ;;     (:variableTypes
+  ;;      (:enabled t))
+  ;;     (:parameterTypes
+  ;;      (:enabled t)))))
 
   ;; (add-to-list
   ;;  'eglot-server-programs
@@ -108,9 +131,11 @@
        ;; :organizeImportsNumericCollation                                    ;; boolean
        ;; :organizeImportsAccentCollation                                     ;; boolean
        ;; :organizeImportsCaseFirst                                           ;; "upper" | "lower" | false
-       :disableLineTextInReferences                           :json-false)))
+       :disableLineTextInReferences                           :json-false))
+		 )
    )
 
+	(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (defhydra hydra-eglot (:hint nil)
     "language"
     ("a" eglot-code-actions "actions" :color blue)
@@ -130,14 +155,40 @@
   (evil-define-key 'normal 'eglot-mode-map
     "gR" 'eglot-rename
     ;; "." 'eglot-code-action-quickfix
+		"K" 'eldoc-box-help-at-point
     ";" 'hydra-eglot/body)
   )
 
+(use-package eldoc-box
+  ;; :hook (eglot-managed-mode . eldoc-box-hover-mode)
+	:config
+	;; (defun my/eldoc-box-setup-keys ()
+	;; 	"Set up buffer-local keybindings in the eldoc-box buffer."
+	;; 	;; `this-buffer` is the doc buffer of eldoc-box
+	;; 	(local-set-key (kbd "j") #'eldoc-box-scroll-down)   ;; j scrolls *down* (because content moves up)
+	;; 	(local-set-key (kbd "k") #'eldoc-box-scroll-up)
+	;; 	(local-set-key (kbd "q") #'eldoc-box--hide-frame)
+	;; 	;; Optionally <escape>
+	;; 	(local-set-key (kbd "<escape>") #'eldoc-box--hide-frame))
+	;; (add-hook 'eldoc-box-buffer-hook #'my/eldoc-box-setup-keys)
+
+	(add-hook 'eldoc-box-buffer-hook
+            (lambda ()
+              (let ((map (make-sparse-keymap)))
+                ;; Vim-style navigation
+                (define-key map (kbd "j") #'eldoc-box-scroll-down)
+                (define-key map (kbd "k") #'eldoc-box-scroll-up)
+                (define-key map (kbd "q") #'eldoc-box--hide-frame)
+                ;; assign to the local buffer
+                (use-local-map (make-composed-keymap map (current-local-map))))))
+	)
+
 (use-package eglot-booster
-  :disabled t
-  :after eglot
-  :vc (:fetcher github :repo jdtsmith/eglot-booster)
-  ;; :vc (eglot-booster :url "https://github.com/jdtsmith/eglot-booster")
-  :config	(eglot-booster-mode))
+  :vc (:url "https://github.com/jdtsmith/eglot-booster" :rev :newest)
+	:after eglot
+	:config	(eglot-booster-mode))
+
+(use-package consult-eglot
+  :after eglot)
 
 (provide 'use-eglot)

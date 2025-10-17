@@ -1,29 +1,32 @@
 (use-package gptel
 	:config
-  (defhydra hydra-ai (:hint nil)
-    "ai"
-    ("c" gptel "chat" :color blue)
-    ("r" gptel-rewrite "rewrite" :color blue)
-    ("s" gptel-send "send" :color blue)
-    ("a" gptel-add "add" :color blue)
-    ("?" +ai/translate "ask" :color blue)
-    ("m" gptel-menu "menu" :color blue))
+	(defhydra hydra-ai (:hint nil)
+		"ai"
+		("c" gptel "chat" :color blue)
+		("r" gptel-rewrite "rewrite" :color blue)
+		("s" gptel-send "send" :color blue)
+		("a" gptel-add "add" :color blue)
+		("?" +ai/translate "ask" :color blue)
+		("m" gptel-menu "menu" :color blue))
+	;; (setq gptel-api-key (password-store-get "openai/api-key"))
+	(setq gptel-api-key (auth-source-pick-first-password :host "openai" :user "api-key"))
 
   (evil-define-key nil 'global
     (kbd "M-i") 'hydra-ai/body)
 
 	(gptel-make-anthropic "Claude"
-		:stream t
+		;; :stream t
 		:key (auth-source-pick-first-password :host "api.anthropic.com"))
-	(gptel-make-gemini "Gemini"
-    :stream t
-    :key (auth-source-pick-first-password :host "gemini"))
 
-	(gptel-make-openai "DeepSeek"
-		:host "api.deepseek.com"
-		:endpoint "/chat/completions"
-		:stream t
-		:key (auth-source-pick-first-password :host "api.deepseek.com"))
+	;; (gptel-make-gemini "Gemini"
+  ;;   :stream t
+  ;;   :key (auth-source-pick-first-password :host "gemini"))
+
+	;; (gptel-make-openai "DeepSeek"
+	;; 	:host "api.deepseek.com"
+	;; 	:endpoint "/chat/completions"
+	;; 	:stream t
+	;; 	:key (auth-source-pick-first-password :host "api.deepseek.com"))
 
   (setq
    gptel-default-mode #'org-mode
@@ -69,7 +72,7 @@
 														(window-height . ,#'fit-window-to-buffer))))))))
 
 (use-package gptel-quick
-  :vc (:fetcher github :repo karthink/gptel-quick)
+  :vc (:url "https://github.com/karthink/gptel-quick" :rev :newest)
 	:config
 	;; (keymap-set embark-general-map "?" #'gptel-quick)
 	(setq gptel-quick-display nil)
@@ -78,11 +81,15 @@
 (set-face-foreground 'vertical-border "gold")
 
 (use-package chatgpt-shell
-  :disabled t
+  ;; :disabled t
   :custom
+	(chatgpt-shell-streaming nil)
   (chatgpt-shell-openai-key
    (lambda ()
-     (auth-source-pick-first-password :host "api.openai.com")))
+     (auth-source-pick-first-password :host "openai" :user "api-key")))
+	;; (chatgpt-shell-anthropic-key
+  ;;  (lambda ()
+	;; 	 (auth-source-pick-first-password :host "api.anthropic.com")))
   (shell-maker-root-path no-littering-var-directory)
 	(with-eval-after-load 'chatgpt-shell
 		(evil-define-key 'visual 'global (kbd "M-.") 'chatgpt-shell-proofread-region)
@@ -99,6 +106,7 @@
 	)
 
 (use-package aidermacs
+	:disabled t
   :bind (("C-c a" . aidermacs-transient-menu))
 	:init
 	(add-hook 'aidermacs-before-run-backend-hook
@@ -112,12 +120,12 @@
   (aidermacs-default-model "sonnet"))
 
 (use-package copilot
-  :vc (:fetcher github :repo copilot-emacs/copilot.el)
-  ;; :vc (copilot :url "https://github.com/copilot-emacs/copilot.el" :lisp-dir "dist/")
+  :vc (:url "https://github.com/copilot-emacs/copilot.el" :rev :newest)
   :hook (prog-mode . copilot-mode)
   :custom
   (copilot-install-dir (no-littering-expand-var-file-name "copilot"))
   (copilot-indent-offset-warning-disable t)
+	(copilot-max-char-warning-disable t)
   :bind
   (:map copilot-completion-map
 				("<right>" . copilot-accept-completion)
@@ -127,9 +135,38 @@
 				("M-k" . copilot-previous-completion))
   )
 
-(use-package claude-code
-  :vc (:fetcher github :repo stevemolitor/claude-code.el)
-  :config (claude-code-mode)
-  :bind-keymap ("C-c c" . claude-code-command-map)) ;; or your preferred key
+
+;; (use-package claude-code
+;;   :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest)
+;;   :config
+;;   ;; optional IDE integration with Monet
+;;   (add-hook 'claude-code-process-environment-functions #'monet-start-server-function)
+;;   (monet-mode 1)
+
+;;   (claude-code-mode)
+;;   :bind-keymap ("C-c c" . claude-code-command-map)
+
+;;   ;; Optionally define a repeat map so that "M" will cycle thru Claude auto-accept/plan/confirm modes after invoking claude-code-cycle-mode / C-c M.
+;;   :bind
+;;   (:repeat-map my-claude-code-map ("M" . claude-code-cycle-mode)))
+
+;; (use-package claude-code-ide
+;; 	:vc (:fetcher github :repo manzaltu/claude-code-ide.el))
+
+;; (use-package claude-code-ide
+;;   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+;;   :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
+;;   :config
+;; 	(setq claude-code-ide-terminal-backend 'eat)
+;;   ;; (claude-code-ide-emacs-tools-setup)
+;; 	) ; Optionally enable Emacs MCP tools
+
+(use-package monet
+  :vc (:url "https://github.com/stevemolitor/monet" :rev :newest)
+	:config
+	(setq monet-diff-tool #'monet-ediff-tool))
+
+(use-package eca
+  :vc (:url "https://github.com/editor-code-assistant/eca-emacs" :rev :newest))
 
 (provide 'ai)

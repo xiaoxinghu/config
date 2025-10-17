@@ -17,6 +17,15 @@
 ;; https://emacs.stackexchange.com/questions/41886/html-mail-background-has-same-color-as-text
 (setq shr-color-visible-luminance-min 80)
 
+;; set transparency
+;; (set-frame-parameter nil 'alpha-background 85) ; Adjust 85 to your desired opacity (0-100)
+;; (add-to-list 'default-frame-alist '(alpha-background . 85)) ; Adjust 85 to your desired opacity
+
+(set-frame-parameter (selected-frame) 'alpha-background 85)
+(add-to-list 'default-frame-alist '(alpha-background . 85))
+;; (set-frame-parameter (selected-frame) 'alpha '(55 55))
+;; (add-to-list 'default-frame-alist '(alpha 55 55))
+
 ;; ediff
 (setq ediff-split-window-function 'split-window-horizontally)
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -53,6 +62,7 @@
   ((org-mode markdown-mode) . mixed-pitch-mode))
 
 (use-package doom-modeline
+	;; :disabled t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-workspace-name t))
   )
@@ -67,7 +77,7 @@
         global-hl-line-sticky-flag nil))
 
 (use-package modus-themes
-  ;; :disabled t
+  :disabled t
   :custom
   (my/dark-theme 'modus-vivendi-tinted)
   (my/light-theme 'modus-operandi-tinted)
@@ -172,10 +182,44 @@
   )
 
 (use-package ef-themes
-  :disabled t
+  ;; :disabled t
   :config
   (setq ef-themes-to-toggle '(ef-frost ef-bio))
   (load-theme 'ef-bio :no-confirm))
+
+(use-package year-1984-theme
+  :disabled t
+  :config
+  ;; (load-theme 'year-1984 t)
+	(setq my/light-theme 'year-1984)
+	)
+
+(use-package doric-themes
+  :disabled t
+  :demand t
+  :config
+  ;; These are the default values.
+  (setq doric-themes-to-toggle '(doric-light doric-obsidian))
+  (setq doric-themes-to-rotate doric-themes-collection)
+
+  (doric-themes-select 'doric-light)
+
+  ;; ;; To load a random theme instead, use something like one of these:
+  ;;
+  ;; (doric-themes-load-random)
+  ;; (doric-themes-load-random 'light)
+  ;; (doric-themes-load-random 'dark)
+
+  ;; ;; For optimal results, also define your preferred font family (or use my `fontaine' package):
+  ;;
+  ;; (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 160)
+  ;; (set-face-attribute 'variable-pitch nil :family "Aporetic Sans" :height 1.0)
+  ;; (set-face-attribute 'fixed-pitch nil :family "Aporetic Sans Mono" :height 1.0)
+
+  :bind
+  (("<f5>" . doric-themes-toggle)
+   ("C-<f5>" . doric-themes-select)
+   ("M-<f5>" . doric-themes-rotate)))
 
 (use-package catppuccin-theme
   :disabled t
@@ -204,7 +248,7 @@
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t
         doom-themes-padded-modeline nil)
-  (load-theme 'doom-nord t)
+  (load-theme 'doom-zenburn t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (all-the-icons must be installed!)
@@ -246,17 +290,16 @@
       mac-mouse-wheel-smooth-scroll nil)
 
 (use-package spacious-padding
-  ;; :disabled t
   :config
   (setq spacious-padding-widths
-        '( :internal-border-width 15
+        '( :internal-border-width 20
            :header-line-width 4
-           :mode-line-width 6
+           :mode-line-width 8
            :tab-width 4
-           :right-divider-width 0
-           :scroll-bar-width 8))
-  ;; Read the doc string of `spacious-padding-subtle-mode-line' as it
-  ;; is very flexible and provides several examples.
+           :right-divider-width 1
+           :scroll-bar-width 8
+           :fringe-width 10))
+  ;; Subtle mode line for modern appearance
   (setq spacious-padding-subtle-mode-line
         `( :mode-line-active 'default
            :mode-line-inactive vertical-border))

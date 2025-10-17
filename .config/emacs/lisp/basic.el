@@ -1,5 +1,6 @@
 (setq ad-redefinition-action 'accept)
 (setq package-check-signature nil)
+(setq help-window-select t)
 
 ;; (setenv "GPG_TTY" "$(tty)")
 (require 'epa-file)
@@ -66,12 +67,12 @@
 (recentf-mode 1)
 
 ;; this is merged into Emacs, check back when Emacs 30 is released
-(unless (package-installed-p 'vc-use-package)
-  (package-vc-install "https://github.com/slotThe/vc-use-package"))
-(require 'vc-use-package)
+;; (unless (package-installed-p 'vc-use-package)
+;;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
+;; (require 'vc-use-package)
 
 (use-package gcmh
-  :vc (:fetcher github :repo emacsmirror/gcmh)
+  :vc (:url "https://github.com/emacsmirror/gcmh" :rev :newest)
   :config
   (gcmh-mode 1))
 
@@ -84,19 +85,20 @@
 (use-package auth-source
 	:ensure nil
 	:config
+	(auth-source-pass-enable)
 	;; (require 'auth-source-1password)
 	;; empty auth-sources
 	;; (setq auth-sources nil)
 	;; (auth-source-1password-enable)
 	;; (add-to-list 'auth-sources 'macos-keychain-internet)
 	;; (add-to-list 'auth-sources 'macos-keychain-generic)
-	;; (auth-source-pass-enable)
 	)
 
 (auth-source-pass-enable)
 
 (use-package ultra-scroll
-  :vc (:fetcher github :repo jdtsmith/ultra-scroll)
+	:disabled t
+  :vc (:url "https://github.com/jdtsmith/ultra-scroll" :rev :newest)
 	:init
   (setq scroll-conservatively 101 ; important!
         scroll-margin 0)

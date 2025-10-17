@@ -1,5 +1,5 @@
 (use-package lsp-bridge
-  :vc (:fetcher github :repo manateelazycat/lsp-bridge)
+	:vc (:url "https://github.com/manateelazycat/lsp-bridge" :rev :newest)
   :init
   (global-lsp-bridge-mode)
 	:config

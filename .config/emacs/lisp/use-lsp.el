@@ -9,12 +9,13 @@
          ((tsx-ts-mode
            typescript-ts-mode
            svelte-mode
+           svelte-ts-mode
            js-ts-mode) . lsp-deferred))
   ;; :disabled t
   :custom
   (lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
   (lsp-completion-provider :none)       ; Using Corfu as the provider
-  (lsp-diagnostics-provider :flymake)
+  ;; (lsp-diagnostics-provider :flymake)
   (lsp-session-file (locate-user-emacs-file ".lsp-session"))
   (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
   (lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
@@ -110,7 +111,7 @@
     ;; "." 'eglot-code-action-quickfix
     ";" 'hydra-lsp/body)
 
-  (defhydra hydra-lsp (:hint nil)
+  (defhydra hydra-lsp-flymake (:hint nil)
     "lsp"
     ("s" consult-lsp-file-symbols "symbols" :color blue)
     ("e" flymake-show-buffer-diagnostics "errors" :color blue)
@@ -120,6 +121,18 @@
     ("o" lsp-organize-imports "org imports" :color blue)
     ("j" flymake-goto-next-error "next error" :color red)
     ("k" flymake-goto-prev-error "prev error" :color red)
+    ("q" nil "quit"))
+
+  (defhydra hydra-lsp (:hint nil)
+    "lsp"
+    ("s" consult-lsp-file-symbols "symbols" :color blue)
+    ("e" list-flycheck-errors "errors" :color blue)
+    ;; ("e" consult-lsp-diagnostics "errors" :color blue)
+    ("r" lsp-find-references "reference" :color blue)
+    ("R" lsp-rename "rename" :color blue)
+    ("o" lsp-organize-imports "org imports" :color blue)
+    ("j" flycheck-next-error "next error" :color red)
+    ("k" flycheck-previous-error "prev error" :color red)
     ("q" nil "quit"))
 
 

@@ -89,11 +89,11 @@
 	(require 'eaf-browser)
 	)
 
-(use-package pass
-	:custom
-	(auth-source-pass-filename "~/.local/share/password-store")
-	:config
-	(auth-source-pass-enable))
+;; (use-package pass
+;; 	:custom
+;; 	(auth-source-pass-filename "~/.password-store")
+;; 	:config
+;; 	(auth-source-pass-enable))
 
 (use-package password-store)
 

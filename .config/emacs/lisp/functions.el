@@ -93,4 +93,45 @@ Return the command from the run-ext-command-map otherwise"
       (shell-command $cmd $outputb)
       )))
 
+(defun yank-location ()
+  "Copy the full path of the current buffer to the clipboard.
+If a region is selected, append the line range to the path."
+  (interactive)
+  (let ((filepath (buffer-file-name)))
+    (if filepath
+        (let ((path-to-copy
+               (if (use-region-p)
+                   ;; Region is active - add line number or range
+                   (let* ((start-pos (region-beginning))
+                          (end-pos (region-end))
+                          (start-line (line-number-at-pos start-pos))
+                          ;; If end position is at beginning of line, use previous position
+                          (adjusted-end-pos (if (save-excursion
+																									(goto-char end-pos)
+																									(bolp))
+																								(1- end-pos)
+																							end-pos))
+                          (end-line (line-number-at-pos adjusted-end-pos)))
+                     (if (= start-line end-line)
+                         ;; Single line selected (possibly with newline)
+                         (format "%s:%d" filepath start-line)
+                       ;; Multiple lines selected
+                       (format "%s:%d-%d" filepath start-line end-line)))
+                 ;; No region - just the path
+                 filepath)))
+          (kill-new path-to-copy)
+          (message "Copied path: %s" path-to-copy))
+      (message "Buffer is not visiting a file"))))
+
+;; Optional: Bind to a key combination
+;; (global-set-key (kbd "C-c p") 'copy-buffer-path)
+(defun my/treesit-goto-parent ()
+  "Go to the start of the parent Tree-sitter node."
+  (interactive)
+  (let* ((node (treesit-node-at (point)))
+         (parent (treesit-node-parent node)))
+    (if parent
+        (goto-char (treesit-node-start parent))
+      (message "No parent node."))))
+
 (provide 'functions)

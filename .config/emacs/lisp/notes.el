@@ -76,7 +76,7 @@
   ;; babel
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((python . t) (shell . t)))
+   '((python . t) (shell . t) (C . t)))
   (setq org-babel-python-command "python3"
 				org-confirm-babel-evaluate nil)
   ;; fix org-mode table with org-modern
@@ -143,6 +143,7 @@ _SPC_ send        _q_ quit
   ;; (olivetti-mode)
   ;; (olivetti-set-width 80)
   ;; turn off line numbers
+	(setq tab-width 8)
   (display-line-numbers-mode -1))
 
 (add-hook 'org-mode-hook 'my/org-mode)

@@ -1,10 +1,12 @@
+(setq sgml-basic-offset 'tab)
+
 (use-package treesit
   :ensure nil
   :mode (("\\.tsx\\'" . tsx-ts-mode)
-         ("\\.js\\'"  . typescript-ts-mode)
-         ("\\.mjs\\'" . typescript-ts-mode)
+         ("\\.js\\'"  . js-ts-mode)
+         ("\\.mjs\\'" . js-ts-mode)
          ("\\.mts\\'" . typescript-ts-mode)
-         ("\\.cjs\\'" . typescript-ts-mode)
+         ("\\.cjs\\'" . js-ts-mode)
          ("\\.ts\\'"  . typescript-ts-mode)
          ("\\.jsx\\'" . tsx-ts-mode)
          ("\\.json\\'" .  json-ts-mode)
@@ -20,6 +22,8 @@
              ;; Note the version numbers. These are the versions that
              ;; are known to work with Combobulate *and* Emacs.
              '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
+               (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+               (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
                (go . ("https://github.com/tree-sitter/tree-sitter-go" "v0.20.0"))
                (bash "https://github.com/tree-sitter/tree-sitter-bash")
                (html . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
@@ -32,6 +36,7 @@
                (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
                (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
                (lua . ("https://github.com/tree-sitter-grammars/tree-sitter-lua"))
+               (svelte . ("https://github.com/Himujjal/tree-sitter-svelte"))
                (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))))
       (add-to-list 'treesit-language-source-alist grammar)
       ;; Only install `grammar' if we don't already have it
@@ -47,7 +52,10 @@
   ;; that this does *not* extend to hooks! Make sure you migrate them
   ;; also
   (dolist (mapping
-           '((python-mode . python-ts-mode)
+           '((c-mode . c-ts-mode)
+						 (c++-mode . c++-ts-mode)
+						 (c-or-c++-mode . c-or-c++-ts-mode)
+						 (python-mode . python-ts-mode)
              (css-mode . css-ts-mode)
              (typescript-mode . typescript-ts-mode)
              (js-mode . typescript-ts-mode)
@@ -80,9 +88,8 @@
 						(setq py-indent-tabs-mode nil)))
 
 (use-package combobulate
-  :disabled t
-  :ensure nil
-  ;; :vc (:fetcher github :repo mickeynp/combobulate)
+  ;; :disabled t
+  :vc (:url "https://github.com/mickeynp/combobulate" :rev :newest)
   :custom
   ;; You can customize Combobulate's key prefix here.
   ;; Note that you may have to restart Emacs for this to take effect!
@@ -207,6 +214,8 @@
     (jump-to-register :magit-fullscreen))
   :custom
   (magit-diff-refine-hunk 'all)
+  (magit-git-executable "/opt/homebrew/bin/git")
+	(magit-diff-arguments '("--ignore-all-space"))
   :config
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
   ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
@@ -299,6 +308,18 @@
 
 (use-package apheleia
   :config
+	(dolist (mode '(css-mode
+                  css-ts-mode
+                  js-json-mode
+                  js-mode
+                  json-mode
+                  json-ts-mode
+                  js-ts-mode
+                  tsx-ts-mode
+                  typescript-mode
+                  typescript-ts-mode))
+    (setf (alist-get mode apheleia-mode-alist) 'biome))
+
   (apheleia-global-mode +1))
 
 ;; Automatically make file executable when =shebang= is found.
@@ -310,6 +331,10 @@
   (editorconfig-exclude-modes '(org-mode))
   :config
   (editorconfig-mode 1))
+
+(with-eval-after-load 'editorconfig
+  (add-to-list 'editorconfig-indentation-alist
+               '(svelte-ts-mode-indent-offset . svelte-ts-mode-indent-offset)))
 
 (use-package smartparens
   :config
@@ -355,5 +380,8 @@
 
 ;; Major mode for driving just files.
 (use-package justl)
+
+(use-package consult-gh
+	:after consult)
 
 (provide 'code)
