@@ -18,6 +18,10 @@ bindkey -v
 # The following lines were added by compinstall
 zstyle :compinstall filename '/Users/xiaoxing/.config/zsh/.zshrc'
 
+if type brew &>/dev/null; then
+		FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+fi
+
 autoload -Uz compinit
 compinit
 # End of lines added by compinstall
@@ -65,3 +69,6 @@ source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring
 # --- key binds ---
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+
+# bun completions
+[ -s "/Users/xiaoxing/.bun/_bun" ] && source "/Users/xiaoxing/.bun/_bun"
