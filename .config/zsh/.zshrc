@@ -24,7 +24,21 @@ fi
 
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
+zmodload zsh/complist
+zstyle ':completion:*' menu select
+
+# (Optional) Jump straight into the menu on first Tab
+bindkey '^I' menu-select   # ^I is Tab
+
+# 2) Arrow keys will now navigate; add vim-style hjkl too:
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+
+# (Optional) Accept with Ctrl-y (in menu) and execute immediately with Enter
+bindkey -M menuselect '^Y' accept-search
+bindkey -M menuselect '^M' .accept-line
 
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
 [[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh
@@ -67,8 +81,13 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # --- key binds ---
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+# bindkey '^[[A' history-substring-search-up
+# bindkey '^[[B' history-substring-search-down
 
 # bun completions
 [ -s "/Users/xiaoxing/.bun/_bun" ] && source "/Users/xiaoxing/.bun/_bun"
+
+# autocompletion via carapace
+export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+source <(carapace _carapace)
