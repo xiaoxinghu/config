@@ -159,6 +159,19 @@
     ";" 'hydra-eglot/body)
   )
 
+;; (with-eval-after-load 'eglot
+;;   (defun my/eglot--format-markup (thing)
+;;     "Return plain text from THING (suppress markdown font-lock)."
+;;     (if (stringp thing)
+;;         thing
+;;       (replace-regexp-in-string "\r" "" (or (plist-get thing :value) ""))))
+;;   (advice-add 'eglot--format-markup :override #'my/eglot--format-markup))
+
+;; this makes eldoc less aggressive, fixes performance issues with large markdown-like docs
+;; from language servers
+(setq eldoc-echo-area-use-multiline-p nil)
+(setq eldoc-idle-delay 2) ;; very slow refresh
+
 (use-package eldoc-box
   ;; :hook (eglot-managed-mode . eldoc-box-hover-mode)
 	:config
