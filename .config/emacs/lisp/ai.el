@@ -1,59 +1,68 @@
+;;; ai.el --- AI assistant configuration -*- lexical-binding: t; -*-
+
+(setenv "OPENAI_API_KEY"
+        (auth-source-pick-first-password
+         :host "openai"
+         :user "api-key"))
+
+(setenv "GEMINI_API_KEY"
+        "AIzaSyA8T7DMKdoz3owJWSykinYi5fOZ1DmAc38")
+
+;;; Commentary:
+;; Configuration for various AI assistants and code completion tools in Emacs.
+
+;;; Code:
+
+;;; gptel - Primary AI interface
 (use-package gptel
-	:config
-	(defhydra hydra-ai (:hint nil)
-		"ai"
-		("c" gptel "chat" :color blue)
-		("r" gptel-rewrite "rewrite" :color blue)
-		("s" gptel-send "send" :color blue)
-		("a" gptel-add "add" :color blue)
-		("?" +ai/translate "ask" :color blue)
-		("m" gptel-menu "menu" :color blue))
-	;; (setq gptel-api-key (password-store-get "openai/api-key"))
-	(setq gptel-api-key (auth-source-pick-first-password :host "openai" :user "api-key"))
+  :config
+  ;; API key configuration
+  (setq gptel-api-key (auth-source-pick-first-password :host "openai" :user "api-key"))
 
-  (evil-define-key nil 'global
-    (kbd "M-i") 'hydra-ai/body)
+  ;; Configure Claude backend
+  (gptel-make-anthropic "Claude"
+    :key (auth-source-pick-first-password :host "api.anthropic.com"))
 
-	(gptel-make-anthropic "Claude"
-		;; :stream t
-		:key (auth-source-pick-first-password :host "api.anthropic.com"))
+  ;; Default settings
+  (setq gptel-default-mode #'org-mode)
 
-	;; (gptel-make-gemini "Gemini"
-  ;;   :stream t
-  ;;   :key (auth-source-pick-first-password :host "gemini"))
+  ;; Custom directives for different use cases
+  (setq gptel-directives
+        '((rewrite . gptel--rewrite-directive-default)
+          (default
+           . "You are a large language model living in Emacs and a helpful assistant. Respond concisely.")
+          (programming
+           . "You are a large language model and a careful programmer. Provide code and only code as output without any additional text, prompt or note.")
+          (writing
+           . "You are a large language model and a writing assistant. Respond concisely.")
+          (proofread
+           . "You are a writing assistant. Respond concisely.")
+          (chat
+           . "You are a large language model and a conversation partner. Respond concisely.")))
 
-	;; (gptel-make-openai "DeepSeek"
-	;; 	:host "api.deepseek.com"
-	;; 	:endpoint "/chat/completions"
-	;; 	:stream t
-	;; 	:key (auth-source-pick-first-password :host "api.deepseek.com"))
+  ;; Hydra menu for quick access
+  (defhydra hydra-ai (:hint nil)
+    "AI Commands"
+    ("c" gptel "chat" :color blue)
+    ("r" gptel-rewrite "rewrite" :color blue)
+    ("s" gptel-send "send" :color blue)
+    ("a" gptel-add "add" :color blue)
+    ("?" +ai/translate "translate" :color blue)
+    ("m" gptel-menu "menu" :color blue)
+    ("q" nil "quit" :color blue))
 
-  (setq
-   gptel-default-mode #'org-mode
-   ;; gptel-model 'claude-3-sonnet-20240229
-   ;; gptel-model 'deepseek-chat
-   ;; gptel-backend "Claude"
-	 )
+  ;; Global keybinding for AI menu
+  (evil-define-key 'normal 'global
+    (kbd "M-i") 'hydra-ai/body))
 
-	(setq gptel-directives
-				'((rewrite . gptel--rewrite-directive-default)
-					(default
-					 . "You are a large language model living in Emacs and a helpful assistant. Respond concisely.")
-					(programming
-					 . "You are a large language model and a careful programmer. Provide code and only code as output without any additional text, prompt or note.")
-					(writing
-					 . "You are a large language model and a writing assistant. Respond concisely.")
-					(proofread
-					 . "You are a writing assistant. Respond concisely.")
-					(chat
-					 . "You are a large language model and a conversation partner. Respond concisely.")))
-	)
-
-;; (defvar gptel-lookup--history nil)
-
+;;; Custom translation function
 (defun +ai/translate (prompt)
+  "Translate PROMPT to Chinese with explanation using gptel."
   (interactive (list (read-string "Ask: " nil)))
-  (when (string= prompt "") (user-error "A prompt is required."))
+  (when (string= prompt "")
+    (user-error "A prompt is required"))
+  (unless (featurep 'gptel)
+    (user-error "gptel is not available"))
   (gptel-request
 			prompt
 		:system "translate the following text into Chinese, write a one sentence explanation of the text, in Chinese"
@@ -71,102 +80,112 @@
 														(side . bottom)
 														(window-height . ,#'fit-window-to-buffer))))))))
 
+;;; gptel-quick - Quick AI queries
 (use-package gptel-quick
   :vc (:url "https://github.com/karthink/gptel-quick" :rev :newest)
-	:config
-	;; (keymap-set embark-general-map "?" #'gptel-quick)
-	(setq gptel-quick-display nil)
-	)
+  :config
+  (setq gptel-quick-display nil))
 
-(set-face-foreground 'vertical-border "gold")
-
+;;; chatgpt-shell - Alternative AI shell interface
 (use-package chatgpt-shell
-  ;; :disabled t
   :custom
-	(chatgpt-shell-streaming nil)
+  (chatgpt-shell-streaming nil)
   (chatgpt-shell-openai-key
    (lambda ()
      (auth-source-pick-first-password :host "openai" :user "api-key")))
-	;; (chatgpt-shell-anthropic-key
-  ;;  (lambda ()
-	;; 	 (auth-source-pick-first-password :host "api.anthropic.com")))
   (shell-maker-root-path no-littering-var-directory)
-	(with-eval-after-load 'chatgpt-shell
-		(evil-define-key 'visual 'global (kbd "M-.") 'chatgpt-shell-proofread-region)
-		(evil-define-key 'visual 'global (kbd "M-/") 'chatgpt-shell-explain-code)
-		(evil-define-key 'visual 'global (kbd "M-RET") 'chatgpt-shell-send-region))
-	(evil-define-key 'normal 'global (kbd "<leader> ar") 'chatgpt-shell-proofread-region)
-	;; (leader!
-	;;   "a" '(nil :which-key "ai")
-	;;   "ar" '(chatgpt-shell-proofread-region :which-key "proofread")
-	;;   "ap" '(chatgpt-shell-prompt :which-key "prompt")
-	;;   "ae" '(chatgpt-shell-explain-code :which-key "explain")
-	;;   "a RET" '(chatgpt-shell-send-region :which-key "send")
-	;;   "bk" '(kill-this-buffer :which-key "kill buffer"))
-	)
 
-(use-package aidermacs
-	:disabled t
-  :bind (("C-c a" . aidermacs-transient-menu))
-	:init
-	(add-hook 'aidermacs-before-run-backend-hook
-						(lambda ()
-							(setenv "ANTHROPIC_API_KEY" (password-store-get "api.anthropic.com"))
-							(setenv "GEMINI_API_KEY" (password-store-get "gemini"))
-							))
-	(setq aidermacs-backend 'vterm)
-  :custom
-  (aidermacs-use-architect-mode t)
-  (aidermacs-default-model "sonnet"))
+  :config
+  ;; Evil mode keybindings for visual mode
+  (with-eval-after-load 'evil
+    (evil-define-key 'visual 'global
+      (kbd "M-.") 'chatgpt-shell-proofread-region
+      (kbd "M-/") 'chatgpt-shell-explain-code
+      (kbd "M-RET") 'chatgpt-shell-send-region)
 
-(use-package copilot
-  :vc (:url "https://github.com/copilot-emacs/copilot.el" :rev :newest)
-  :hook (prog-mode . copilot-mode)
-  :custom
-  (copilot-install-dir (no-littering-expand-var-file-name "copilot"))
-  (copilot-indent-offset-warning-disable t)
-	(copilot-max-char-warning-disable t)
-  :bind
-  (:map copilot-completion-map
-				("<right>" . copilot-accept-completion)
-				("C-f" . copilot-accept-completion)
-				("C-e" . copilot-accept-completion-by-line)
-				("M-j" . copilot-next-completion)
-				("M-k" . copilot-previous-completion))
-  )
+    (evil-define-key 'normal 'global
+      (kbd "<leader> ar") 'chatgpt-shell-proofread-region)))
 
-
-;; (use-package claude-code
-;;   :vc (:url "https://github.com/stevemolitor/claude-code.el" :rev :newest)
-;;   :config
-;;   ;; optional IDE integration with Monet
-;;   (add-hook 'claude-code-process-environment-functions #'monet-start-server-function)
-;;   (monet-mode 1)
-
-;;   (claude-code-mode)
-;;   :bind-keymap ("C-c c" . claude-code-command-map)
-
-;;   ;; Optionally define a repeat map so that "M" will cycle thru Claude auto-accept/plan/confirm modes after invoking claude-code-cycle-mode / C-c M.
-;;   :bind
-;;   (:repeat-map my-claude-code-map ("M" . claude-code-cycle-mode)))
-
-;; (use-package claude-code-ide
-;; 	:vc (:fetcher github :repo manzaltu/claude-code-ide.el))
-
-;; (use-package claude-code-ide
-;;   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
-;;   :bind ("C-c C-'" . claude-code-ide-menu) ; Set your favorite keybinding
-;;   :config
-;; 	(setq claude-code-ide-terminal-backend 'eat)
-;;   ;; (claude-code-ide-emacs-tools-setup)
-;; 	) ; Optionally enable Emacs MCP tools
-
+;;; monet - AI code editing tool
 (use-package monet
   :vc (:url "https://github.com/stevemolitor/monet" :rev :newest)
-	:config
-	(setq monet-diff-tool #'monet-ediff-tool))
+  :config
+  (setq monet-diff-tool #'monet-ediff-tool))
 
+;;; eca - Editor Code Assistant
 (use-package eca
   :vc (:url "https://github.com/editor-code-assistant/eca-emacs" :rev :newest))
+
+;;; agent-shell - AI agent interaction
+(use-package agent-shell
+  :config
+  (setq agent-shell-anthropic-claude-environment
+        (agent-shell-make-environment-variables
+         "ANTHROPIC_API_KEY" (auth-source-pick-first-password :host "api.anthropic.com"))))
+
+;;; UI Configuration
+(set-face-foreground 'vertical-border "gold")
+
+;; document the config of minuet
+(use-package minuet
+	:init
+  ;; if you want to enable auto suggestion.
+  ;; Note that you can manually invoke completions without enable minuet-auto-suggestion-mode
+  (add-hook 'prog-mode-hook #'minuet-auto-suggestion-mode)
+	(add-hook 'minuet-active-mode-hook #'evil-normalize-keymaps)
+	:bind
+  (("M-y" . minuet-complete-with-minibuffer)
+   ("M-i" . minuet-show-suggestion)
+   ;; ("C-c m" . minuet-configure-provider)
+   :map minuet-active-mode-map
+   ("M-p" . minuet-previous-suggestion)
+   ("M-n" . minuet-next-suggestion)
+   ("M-a" . minuet-accept-suggestion-line)
+	 ("M-A" . minuet-accept-suggestion)
+   ("M-e" . minuet-dismiss-suggestion))
+	:config
+	;; (setq minuet-provider 'openai-compatible)
+	(setq minuet-provider 'gemini)
+	(plist-put minuet-openai-compatible-options
+             :model "gemini-2.5-flash")
+	;; (plist-put minuet-openai-compatible-options
+  ;;            :model "deepseek/deepseek-r1-0528-qwen3-8b")
+
+  ;; Local endpoint for chat completions
+  ;; (plist-put minuet-openai-compatible-options
+  ;;            :end-point "http://localhost:1234/v1/chat/completions")
+
+  ;; LM Studio does not require authentication.
+  ;; Minuet requires a NON-EMPTY env var name, so "TERM" works.
+  ;; (plist-put minuet-openai-compatible-options
+  ;;            :api-key "TERM")
+	(setq minuet-request-timeout 60)
+
+	(minuet-set-optional-options minuet-openai-compatible-options
+                               :max_tokens 256)
+
+	;; (minuet-set-optional-options minuet-openai-compatible-options :stream nil)
+
+
+	;; (setq minuet-openai-options
+	;; 			(plist-put minuet-openai-options
+	;; 								 :api-key
+	;; 								 (lambda ()
+	;; 									 (auth-source-pick-first-password
+	;; 										:host "openai"
+	;; 										:user "api-key"))))
+	;; (setq minuet-request-timeout 2)
+	;; (setq minuet-auto-suggestion-debounce-delay 0.5)
+	;; (setq minuet-auto-suggestion-throttle-delay 1.5)
+	;; (minuet-set-optional-options minuet-openai-compatible-options :provider '(:sort "throughput"))
+	;; (dolist (provider (list minuet-openai-options
+  ;;                         minuet-codestral-options
+  ;;                         minuet-openai-compatible-options
+  ;;                         minuet-openai-fim-compatible-options))
+  ;;   (minuet-set-optional-options provider :max_tokens 128)
+  ;;   (minuet-set-optional-options provider :top_p 0.9))
+
+	)
+
 
 (provide 'ai)
