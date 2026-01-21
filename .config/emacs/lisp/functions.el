@@ -173,6 +173,15 @@ If LANG is nil, prompt for it."
 
 (add-hook 'compilation-filter-hook #'my/colorize-compilation-buffer)
 
+;; Bun test error format: at <anonymous> (/path/to/file.ts:12:17)
+(require 'compile)
+(add-to-list 'compilation-error-regexp-alist-alist
+             '(bun-test
+               "at [^(]*(\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\))"
+               1 2 3 2))
+
+(add-to-list 'compilation-error-regexp-alist 'bun-test)
+
 (defvar my/runner-alist
   '(
 		(("ts" "js") . "bun %f")

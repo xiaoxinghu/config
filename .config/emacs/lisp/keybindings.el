@@ -131,7 +131,7 @@ Buffers
 
 (defhydra hydra-toggle (:hint nil)
   "git"
-  ("t" ef-themes-toggle "theme" :color blue)
+  ("t" treemacs "tree" :color blue)
   ("m" toggle-frame-maximized "max" :color blue)
   ("q" nil "quit"))
 
