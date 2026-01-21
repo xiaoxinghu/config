@@ -182,12 +182,24 @@ If LANG is nil, prompt for it."
 
 %f is replaced with the absolute file name.")
 
+(defun my--test-file-p (file)
+  "Return non-nil if FILE is a test file."
+  (string-match-p "\\(?:[._]\\(?:test\\|spec\\)\\)\\.\\(?:ts\\|js\\)\\'" file))
+
+(defcustom my/test-runner-command "bun test %f"
+  "Command template for running test files.
+%f is replaced with the absolute file name."
+  :type 'string
+  :group 'my-scratch)
+
 (defun my--runner-for-file (file)
   "Return run command for FILE based on extension."
-  (let ((ext (file-name-extension file)))
-    (cl-loop for (exts . cmd) in my/runner-alist
-             when (member ext exts)
-             return cmd)))
+  (if (my--test-file-p file)
+      my/test-runner-command
+    (let ((ext (file-name-extension file)))
+      (cl-loop for (exts . cmd) in my/runner-alist
+               when (member ext exts)
+               return cmd))))
 
 (defun my/run-current-buffer ()
   "Run current buffer using an appropriate runner."
