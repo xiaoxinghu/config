@@ -1,6 +1,7 @@
 # -*- mode: snippet -*-
-# name: if
+# name: lambda
+# key: lam
 # --
-if (${1:true}) {
+($1) => {
     $0
 }
