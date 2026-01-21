@@ -50,11 +50,13 @@
   (marginalia-mode))
 
 ;; TODO: add meaningful bindings
+;; (with-eval-after-load 'isearch
+;; 	(define-key isearch-mode-map (kbd "s-e") nil))
 (use-package embark
   :bind
-  ("M-." . embark-act)
-  ("M-;" . embark-dwim)
-  ("M-e" . embark-export)
+  ("s-." . embark-act)
+  ("s-;" . embark-dwim)
+  ("s-e" . embark-export)
   ("C-h B" . embark-bindings))
 
 (use-package embark-consult
@@ -107,10 +109,10 @@
   (corfu-popupinfo-mode) ; Popup completion info
   :bind (:map corfu-map
               ("M-SPC"      . corfu-insert-separator)
-              ("TAB"        . corfu-next)
-              ([tab]        . corfu-next)
-              ("S-TAB"      . corfu-previous)
-              ([backtab]    . corfu-previous)
+              ;; ("TAB"        . corfu-next)
+              ;; ([tab]        . corfu-next)
+              ;; ("S-TAB"      . corfu-previous)
+              ;; ([backtab]    . corfu-previous)
               ("S-<return>" . corfu-insert)
               ("RET"        . corfu-insert))
   )
@@ -345,5 +347,19 @@
     (kbd "<leader> 4") 'harpoon-go-to-4
     (kbd "<leader> 5") 'harpoon-go-to-5)
   )
+
+(defun my/tab-dwim ()
+  "Do what I mean: yasnippet > completion > indent."
+  (interactive)
+  (cond
+   ;; Expand snippet if possible
+   ((bound-and-true-p yas-minor-mode)
+    (or (yas-expand)
+        (completion-at-point)
+        (indent-for-tab-command)))
+   (t
+    (completion-at-point))))
+
+(global-set-key (kbd "TAB") #'my/tab-dwim)
 
 (provide 'navigation)

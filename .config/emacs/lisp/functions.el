@@ -134,4 +134,95 @@ If a region is selected, append the line range to the path."
         (goto-char (treesit-node-start parent))
       (message "No parent node."))))
 
+(defgroup my-scratch nil
+  "Scratch projects for ad-hoc coding with LSP."
+  :group 'tools)
+
+;; ----- scratch code buffer -----
+(defcustom my-scratch-projects
+  '((typescript . "~/projects/scratch/js/index.ts"))
+  "Mapping of scratch project names to entry files."
+  :type '(alist :key-type symbol :value-type string)
+  :group 'my-scratch)
+
+(defun my-open-scratch (&optional lang)
+  "Open a scratch project entry file.
+If LANG is nil, prompt for it."
+  (interactive)
+  (let* ((choice
+          (or lang
+              (intern
+               (completing-read
+                "Scratch project: "
+                (mapcar #'symbol-name (mapcar #'car my-scratch-projects))
+                nil t))))
+         (file (cdr (assq choice my-scratch-projects))))
+    (unless file
+      (user-error "No scratch project configured for %s" choice))
+    (find-file (expand-file-name file))
+    ;; Optional but usually what you want
+    (when (fboundp 'eglot-ensure)
+      (eglot-ensure))))
+
+;; ----- render color correctly -----
+(require 'ansi-color)
+
+(defun my/colorize-compilation-buffer ()
+  "Apply ANSI color codes in compilation buffer."
+  (ansi-color-apply-on-region compilation-filter-start (point)))
+
+(add-hook 'compilation-filter-hook #'my/colorize-compilation-buffer)
+
+(defvar my/runner-alist
+  '(
+		(("ts" "js") . "bun %f")
+		(("c") . "cc %f && ./a.out")
+		)
+  "Alist mapping file extensions to run commands.
+
+%f is replaced with the absolute file name.")
+
+(defun my--runner-for-file (file)
+  "Return run command for FILE based on extension."
+  (let ((ext (file-name-extension file)))
+    (cl-loop for (exts . cmd) in my/runner-alist
+             when (member ext exts)
+             return cmd)))
+
+(defun my/run-current-buffer ()
+  "Run current buffer using an appropriate runner."
+  (interactive)
+  (unless (buffer-file-name)
+    (user-error "Buffer is not visiting a file"))
+
+  (save-buffer)
+
+  (let* ((file (buffer-file-name))
+         (cmd-template (my--runner-for-file file)))
+    (unless cmd-template
+      (user-error "No runner configured for %s" file))
+
+    (compile
+     (replace-regexp-in-string
+      "%f"
+      (shell-quote-argument file)
+      cmd-template
+      t t))))
+
+(defun my/bun-debug-current-buffer (&optional wait)
+  "Start debugging the current JS/TS buffer with Bun inspector.
+If WAIT is non-nil, use --inspect-wait so Bun waits for the debugger to attach."
+  (interactive "P")
+  (unless (buffer-file-name)
+    (user-error "Buffer is not visiting a file"))
+
+  (save-buffer)
+  (let* ((file (buffer-file-name))
+         (flag (if wait "--inspect-wait" "--inspect-brk"))
+         (cmd (format "bun %s %s"
+                      flag
+                      (shell-quote-argument file))))
+    (compilation-start cmd 'compilation-mode
+                       (lambda (_mode) "*bun debug*"))))
+
 (provide 'functions)

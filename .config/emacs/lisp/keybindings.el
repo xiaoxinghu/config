@@ -1,7 +1,8 @@
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier 'super)
+;; (setq mac-command-modifier 'meta)
+;; (setq mac-option-modifier 'super)
 
 (global-set-key (kbd "M-c") nil)
+(global-set-key (kbd "M-h") 'ns-do-hide-emacs)
 
 (use-package evil
   :init
@@ -48,29 +49,30 @@
 (use-package hydra)
 
 (evil-define-key nil 'global
-  (kbd "M-o") 'find-file
-  (kbd "M-d") 'dired-jump
-  (kbd "M-w") 'kill-current-buffer
-  (kbd "M-q") 'save-buffers-kill-terminal
-  ;; (kbd "M-r") 'consult-recent-file
-  (kbd "M-b") 'consult-buffer
-  ;; (kbd "M-b") 'switch-to-buffer
-  (kbd "M-g") 'magit-status
-  (kbd "M-s") 'save-buffer
-  (kbd "M-S") 'save-some-buffers
-  (kbd "M-v") 'yank
-  (kbd "M-a") 'mark-whole-buffer
-  (kbd "M-f") 'consult-line
-  (kbd "M-F") 'consult-ripgrep
-  (kbd "M-t") 'tab-new
-  (kbd "M-{") 'tab-previous
-  (kbd "M-}") 'tab-next
-  (kbd "M-=") 'text-scale-increase
-  (kbd "M--") 'text-scale-decrease
-  (kbd "M-r") 'revert-buffer-quick
-  (kbd "M-0") (lambda () (interactive) (text-scale-set 0))
-  (kbd "M-n") 'xah-new-empty-buffer
-  (kbd "M-`") 'evil-switch-to-windows-last-buffer
+  (kbd "s-o") 'find-file
+  (kbd "s-x") 'execute-extended-command
+  (kbd "s-d") 'dired-jump
+  ;; (kbd "s-w") 'kill-current-buffer
+  ;; (kbd "s-q") 'save-buffers-kill-terminal
+  ;; (kbd "s-r") 'consult-recent-file
+  (kbd "s-b") 'consult-buffer
+  ;; (kbd "s-b") 'switch-to-buffer
+  (kbd "s-g") 'magit-status
+  ;; (kbd "s-s") 'save-buffer
+  (kbd "s-S") 'save-some-buffers
+  ;; (kbd "s-v") 'yank
+  ;; (kbd "s-a") 'mark-whole-buffer
+  (kbd "s-f") 'consult-line
+  (kbd "s-F") 'consult-ripgrep
+  ;; (kbd "s-t") 'tab-new
+  ;; (kbd "s-{") 'tab-previous
+  ;; (kbd "s-}") 'tab-next
+  ;; (kbd "s-=") 'text-scale-increase
+  ;; (kbd "s--") 'text-scale-decrease
+  (kbd "s-r") 'revert-buffer-quick
+  ;; (kbd "s-0") (lambda () (interactive) (text-scale-set 0))
+  ;; (kbd "s-n") 'xah-new-empty-buffer
+  ;; (kbd "s-`") 'evil-switch-to-windows-last-buffer
   )
 
 (evil-define-key 'normal 'global
@@ -98,6 +100,7 @@
 Buffers
 "
   ("b" consult-buffer "buffers" :color blue)
+  ("r" my/run-current-buffer "run" :color blue)
   ("l" bufler "list" :color blue)
   ("k" kill-current-buffer "kill buffer" :color blue)
   ("s" save-some-buffers "save all buffers" :color blue)
@@ -119,6 +122,12 @@ Buffers
   (kbd "<leader>o") '("open" . (keymap))
   (kbd "<leader>x") '("eval" . (keymap))
   (kbd "<leader>xx") '("eval" . elisp-eval-region-or-buffer))
+
+(evil-define-key 'normal 'global
+  (kbd "<leader>s") '("scratch" . (keymap))
+  (kbd "<leader>st") '("typescript" . (lambda ()
+																				(interactive)
+																				(my-open-scratch 'typescript))))
 
 (defhydra hydra-toggle (:hint nil)
   "git"

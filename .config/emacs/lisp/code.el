@@ -308,17 +308,17 @@
 
 (use-package apheleia
   :config
-	(dolist (mode '(css-mode
-                  css-ts-mode
-                  js-json-mode
-                  js-mode
-                  json-mode
-                  json-ts-mode
-                  js-ts-mode
-                  tsx-ts-mode
-                  typescript-mode
-                  typescript-ts-mode))
-    (setf (alist-get mode apheleia-mode-alist) 'biome))
+	;; (dolist (mode '(css-mode
+  ;;                 css-ts-mode
+  ;;                 js-json-mode
+  ;;                 js-mode
+  ;;                 json-mode
+  ;;                 json-ts-mode
+  ;;                 js-ts-mode
+  ;;                 tsx-ts-mode
+  ;;                 typescript-mode
+  ;;                 typescript-ts-mode))
+  ;;   (setf (alist-get mode apheleia-mode-alist) 'biome))
 
   (apheleia-global-mode +1))
 
@@ -336,10 +336,22 @@
   (add-to-list 'editorconfig-indentation-alist
                '(svelte-ts-mode-indent-offset . svelte-ts-mode-indent-offset)))
 
-(use-package smartparens
-  :config
-  (require 'smartparens-config)
-  (add-hook 'prog-mode-hook #'smartparens-mode))
+;; (use-package smartparens
+;;   :config
+;;   (require 'smartparens-config)
+;;   (add-hook 'prog-mode-hook #'smartparens-mode))
+
+(use-package electric
+  :ensure nil
+  :hook (prog-mode . electric-pair-mode)
+  ;; :custom
+  ;; (electric-pair-pairs
+  ;;  '((?\( . ?\))
+  ;;    (?\[ . ?\])
+  ;;    (?\{ . ?\})
+  ;;    (?\" . ?\")
+  ;;    (?\' . ?\')))
+	)
 
 ;; Code folding. TBH, I don't fold my code.
 (use-package origami
@@ -374,6 +386,11 @@
   (yas-global-mode 1)
   )
 
+(use-package yasnippet-capf
+  :after yasnippet
+  :init
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
+
 (use-package dockerfile-mode
   :mode "Dockerfile\\'")
 
@@ -383,5 +400,117 @@
 
 (use-package consult-gh
 	:after consult)
+
+(use-package dape
+  :preface
+  ;; By default dape shares the same keybinding prefix as `gud'
+  ;; If you do not want to use any prefix, set it to nil.
+  ;; (setq dape-key-prefix "\C-x\C-a")
+
+  :hook
+  ;; Save breakpoints on quit
+  (kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+  (after-init . dape-breakpoint-load)
+
+  :custom
+  ;; Turn on global bindings for setting breakpoints with mouse
+  (dape-breakpoint-global-mode +1)
+
+  ;; Info buffers to the right
+  ;; (dape-buffer-window-arrangement 'right)
+  ;; Info buffers like gud (gdb-mi)
+  ;; (dape-buffer-window-arrangement 'gud)
+  ;; (dape-info-hide-mode-line nil)
+
+  ;; Projectile users
+  (dape-cwd-function #'projectile-project-root)
+
+  :config
+
+	(defhydra hydra-debug (:color pink :hint nil)
+		"
+^Stepping^        ^Breakpoints^        ^Session^
+--------------------------------------------------
+_n_: next         _b_: toggle          _d_: debug
+_i_: step in      _B_: delete all      _r_: restart
+_o_: step out     _C_: condition       _K_: kill
+_c_: continue     _L_: log message     _D_: disconnect
+"
+		;; stepping
+		("n" dape-next)
+		("i" dape-step-in)
+		("o" dape-step-out)
+		("c" dape-continue)
+
+		;; breakpoints
+		("b" dape-breakpoint-toggle)
+		("B" dape-breakpoint-remove-all)
+		("C" dape-breakpoint-condition)
+		("L" dape-breakpoint-log-message)
+
+		;; session
+		("d" dape)
+		("r" dape-restart)
+		("K" dape-kill :color red)
+		("D" dape-disconnect :color red)
+
+		;; exit hydra only
+		("<escape>" nil "quit" :color blue))
+
+	;; 	(defhydra hydra-debug (:color pink :hint nil)
+	;; 		"
+	;; ^Stepping^        ^Breakpoints^       ^Session^         ^Eval/Watch^
+	;; ^^^^^^^^----------------------------------------------------------------
+	;; _n_: Next         _b_: Toggle         _d_: Debug        _e_: Watch expr
+	;; _i_: Step in      _B_: Remove all     _r_: Restart      _E_: Eval region
+	;; _o_: Step out     _l_: Log message    _q_: Quit/Stop
+	;; _c_: Continue
+	;; "
+	;; 		;; stepping
+	;; 		("n" dape-next)
+	;; 		("i" dape-step-in)
+	;; 		("o" dape-step-out)
+	;; 		("c" dape-continue)
+
+	;; 		;; breakpoints
+	;; 		("b" dape-breakpoint-toggle)
+	;; 		("B" dape-breakpoint-remove-all)
+	;; 		("l" dape-breakpoint-log-message)
+
+	;; 		;; session control
+	;; 		("d" dape)
+	;; 		("r" dape-restart)
+	;; 		("q" dape-disconnect :color red)
+
+	;; 		;; eval/watch
+	;; 		("e" dape-watch-add :exit nil)
+	;; 		("E" dape-eval-region)
+	;; 		;; exit
+	;; 		("<escape>" nil "quit" :color blue)
+	;; 		("q" nil "quit" :color blue))
+
+	(evil-define-key 'normal 'global
+		(kbd "<leader>d") 'hydra-debug/body)
+
+  ;; Pulse source line (performance hit)
+  (add-hook 'dape-display-source-hook #'pulse-momentary-highlight-one-line)
+
+  ;; Save buffers on startup, useful for interpreted languages
+  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
+
+  ;; Kill compile buffer on build success
+  ;; (add-hook 'dape-compile-hook #'kill-buffer)
+  )
+
+;; For a more ergonomic Emacs and `dape' experience
+;; (use-package repeat
+;;   :custom
+;;   (repeat-mode +1))
+
+;; Left and right side windows occupy full frame height
+(use-package emacs
+  :custom
+  (window-sides-vertical t))
 
 (provide 'code)

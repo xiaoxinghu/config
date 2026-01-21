@@ -79,7 +79,7 @@
 (use-package modus-themes
   ;; :disabled t
   :custom
-  (my/dark-theme 'modus-vivendi)
+  (my/dark-theme 'modus-vivendi-tinted)
   (my/light-theme 'modus-operandi)
   :init
   ;; Always reload the theme for changes to take effect!

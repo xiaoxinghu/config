@@ -51,4 +51,6 @@
 (+macos--open-with reveal-project-in-finder "Finder"
                    (or (doom-project-root) default-directory))
 
+(use-package emacs-everywhere)
+
 (provide 'macos)

@@ -64,6 +64,8 @@
 		 ))
 
   :config
+	(setq org-link-frame-setup
+				'((file . find-file)))
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
   (require 'org-protocol)
   (require 'org-archive)
@@ -76,9 +78,10 @@
   ;; babel
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((python . t) (shell . t) (C . t)))
+   '((python . t) (shell . t) (C . t) (ditaa . t)))
   (setq org-babel-python-command "python3"
 				org-confirm-babel-evaluate nil)
+
   ;; fix org-mode table with org-modern
   ;; (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (custom-set-variables '(org-modern-table nil))
@@ -248,7 +251,7 @@ _SPC_ send        _q_ quit
 (use-package denote
   :custom
   (denote-directory my/org-location)
-  (denote-prompts '(title))
+  (denote-prompts '(title keywords))
 	;; (denote-file-type 'text)
   ;; (denote-journal-extras-title-format 'day-date-month-year)
   ;; (denote-j
@@ -271,6 +274,9 @@ _SPC_ send        _q_ quit
   ;; Read the doc string of `denote-journal-title-format'.
   (setq denote-journal-title-format 'day-date-month-year))
 
+(use-package denote-org
+	:after (denote))
+
 (defhydra hydra-notes (:hint nil)
   "
 _n_ notes      _SPC_ now        _q_ quit
@@ -283,6 +289,7 @@ _j_ journal    _a_ agenda
   ("f" (affe-find my/org-location) :color blue)
   ("s" (affe-grep my/org-location) :color blue)
   ("j" denote-journal-extras-new-or-existing-entry :color blue)
+  ("l" denote-insert-link :color blue)
   ;; ("t" org-roam-dailies-goto-today "Today" :color blue)
   ("q" nil))
 
