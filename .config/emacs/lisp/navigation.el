@@ -278,6 +278,7 @@
   ;; (set-face-background 'treemacs-hl-line-face "#535353")
   (treemacs-follow-mode t)
 	(treemacs-project-follow-mode t)
+	(setq treemacs-project-follow-cleanup t)
   ;; (setq treemacs-no-png-images t)
   )
 
