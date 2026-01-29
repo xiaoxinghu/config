@@ -18,3 +18,10 @@ curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/config/refs/heads/main/b
 #+begin_src sh
 bin/install-node.sh
 #+end_src
+
+
+*** Setup tmux
+need to install tpm
+#+begin_src sh
+bin/setup-tmux.sh
+#+end_src
