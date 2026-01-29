@@ -21,4 +21,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Bun
 export PATH="$HOME/.bun/bin:$PATH"
-. "$HOME/.cargo/env"
+
+if [[ -d "$HOME/.cargo" ]]; then
+		. "$HOME/.cargo/env"
+fi
