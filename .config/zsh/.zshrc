@@ -103,3 +103,10 @@ fi
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 source <(carapace _carapace)
+
+# bun completions
+[ -s "/Users/Xiaoxing.Hu@nib.co.nz/.bun/_bun" ] && source "/Users/Xiaoxing.Hu@nib.co.nz/.bun/_bun"
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

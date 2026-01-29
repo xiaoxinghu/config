@@ -10,3 +10,11 @@ My personal dotfiles, managed using a **bare Git repository** for a clean `$HOME
 #+begin_src sh
 curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/config/refs/heads/main/bin/setup.sh | bash
 #+end_src
+
+** Optional
+
+*** Install node
+
+#+begin_src sh
+bin/install-node.sh
+#+end_src
