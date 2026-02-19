@@ -78,11 +78,11 @@
 
 (use-package modus-themes
   ;; :disabled t
-  :custom
-  (my/dark-theme 'modus-vivendi-tinted)
-  (my/light-theme 'modus-operandi)
   :init
-  ;; Always reload the theme for changes to take effect!
+  ;; Set theme vars immediately so the appearance-change hook works
+  ;; even before modus-themes is explicitly loaded.
+  (setq my/dark-theme 'modus-vivendi-tinted
+        my/light-theme 'modus-operandi)
 
 	:config
 	(setq
@@ -211,6 +211,7 @@
       mac-mouse-wheel-smooth-scroll nil)
 
 (use-package spacious-padding
+  :hook (after-init . spacious-padding-mode)
   :config
   (setq spacious-padding-widths
         '( :internal-border-width 20
@@ -223,7 +224,6 @@
   ;; Subtle mode line for modern appearance
   (setq spacious-padding-subtle-mode-line
         `( :mode-line-active 'default
-           :mode-line-inactive vertical-border))
-  (spacious-padding-mode 1))
+           :mode-line-inactive vertical-border)))
 
 (provide 'ui)

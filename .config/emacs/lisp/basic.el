@@ -1,6 +1,7 @@
 (setq ad-redefinition-action 'accept)
 (setq package-check-signature nil)
 (setq help-window-select t)
+(setq use-package-always-defer t)
 
 ;; (setenv "GPG_TTY" "$(tty)")
 (require 'epa-file)
@@ -26,6 +27,7 @@
 (setq use-package-always-ensure t)
 
 (use-package exec-path-from-shell
+  :demand t
   :config
   (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH" "ASPELL_CONF" "DICPATH" "CFLAGS" "LDFLAGS" "PKG_CONFIG_PATH"))
     (add-to-list 'exec-path-from-shell-variables var))
@@ -51,6 +53,7 @@
 
 
 (use-package no-littering
+	:demand t
 	:config
 	(no-littering-theme-backups)
 	(let ((dir (no-littering-expand-var-file-name "lock-files/")))
@@ -73,14 +76,12 @@
 
 (use-package gcmh
   :vc (:url "https://github.com/emacsmirror/gcmh" :rev :newest)
-  :config
-  (gcmh-mode 1))
+  :hook (after-init . gcmh-mode))
 
 (use-package direnv
   :custom
   (direnv-always-show-summary nil)
-  :config
-  (direnv-mode))
+  :hook (after-init . direnv-mode))
 
 (use-package auth-source
 	:ensure nil

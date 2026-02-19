@@ -30,6 +30,7 @@
     (add-to-list 'lsp--formatting-indent-alist '(jsx-mode . js-indent-level)))
 	)
 
+
 ;; (use-package javascript-mode
 ;;   :ensure nil
 ;;   :mode (("\\.[m|c]?js\\'" . javascript-mode))

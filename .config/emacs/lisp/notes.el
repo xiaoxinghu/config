@@ -50,6 +50,15 @@
 			"* %?\n %i\n")
 		 ("L" "Link" entry (file+headline org-default-notes-file "Inbox")
 			"* TODO %?[[%:link][%:description]] %U\n%i\n")
+		 ("l" "Links"
+      entry
+      (file ,(expand-file-name "links.org" my/org-location))
+      "* TODO [[%:link][%:description]]\n\
+:PROPERTIES:\n\
+:CREATED:  %U\n\
+:END:\n\n\
+%?\n"
+      :empty-lines 1)
 		 ;; ("j" "Journal" entry
 		 ;;  (file+olp+datetree ,(expand-file-name "journal.org" my/org-location))
 		 ;;  "* %<%Y-%m-%d %H:%M> \n\n%?"
@@ -315,7 +324,7 @@ _j_ journal    _a_ agenda
 
 (use-package evil-org
   :after org
-  :hook (org-mode . (lambda () evil-org-mode))
+  :hook (org-mode . evil-org-mode)
   :config
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
@@ -331,8 +340,9 @@ _j_ journal    _a_ agenda
 (use-package org-download)
 (use-package org-cliplink)
 
-(define-key org-mode-map (kbd "M-}") nil)
-(define-key org-mode-map (kbd "M-{") nil)
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "M-}") nil)
+  (define-key org-mode-map (kbd "M-{") nil))
 
 ;; (use-package edraw-mode
 ;;   :after org

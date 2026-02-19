@@ -5,13 +5,17 @@
 (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
 
 (use-package evil
+  :demand t
   :init
   ;; (setq evil-want-C-u-scroll t)
   :custom
   (evil-want-keybinding nil)
   ;; (evil-want-minibuffer t)
+
   :config
   (evil-mode 1)
+	(evil-set-leader 'normal (kbd "SPC"))
+	(evil-set-leader 'normal (kbd ",") t)
   (evil-set-undo-system 'undo-redo)
   (define-key evil-motion-state-map (kbd "C-i") 'evil-jump-forward)
   )
@@ -20,6 +24,7 @@
 ;;   (define-key evil-motion-state-map (kbd "RET") nil))
 
 (use-package evil-collection
+  :demand t
   :after evil
   :init
   (setq forge-add-default-bindings nil)
@@ -27,26 +32,30 @@
   (evil-collection-init))
 
 (use-package evil-surround
+  :demand t
+  :after evil
   :config
   (global-evil-surround-mode 1))
 
 (use-package evil-commentary
+  :demand t
+  :after evil
   :config (evil-commentary-mode 1))
 
 (use-package evil-snipe
+  :demand t
+  :after evil
 	:config
   (evil-snipe-mode 1)
   (evil-snipe-override-mode 1)
 	(add-hook 'magit-mode-hook 'turn-off-evil-snipe-override-mode))
 
-(evil-set-leader 'normal (kbd "SPC"))
-(evil-set-leader 'normal (kbd ",") t)
 
 (use-package which-key
-  :config
-  (which-key-mode 1))
+  :hook (after-init . which-key-mode))
 
-(use-package hydra)
+(use-package hydra
+  :demand t)
 
 (evil-define-key nil 'global
   (kbd "s-o") 'find-file

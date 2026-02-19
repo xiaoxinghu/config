@@ -185,10 +185,10 @@
 
 ;; search
 (use-package anzu
-  :config
-  (global-anzu-mode +1))
+  :hook (after-init . global-anzu-mode))
 
 (use-package evil-anzu
+  :demand t
   :after evil
   :config
   (require 'evil-anzu))

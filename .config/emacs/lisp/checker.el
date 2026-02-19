@@ -12,10 +12,9 @@
 (use-package jinx
   ;; :ensure nil
   ;; :disabled t
+  :hook ((text-mode prog-mode) . jinx-mode)
   :config
   (setq jinx-languages "en_GB")
-  (define-key evil-normal-state-map (kbd "z =") 'jinx-correct)
-  (add-hook 'emacs-startup-hook #'global-jinx-mode)
-  )
+  (define-key evil-normal-state-map (kbd "z =") 'jinx-correct))
 
 (provide 'checker)

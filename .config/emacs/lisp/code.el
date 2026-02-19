@@ -103,6 +103,8 @@
   )
 
 (use-package evil-textobj-tree-sitter
+  :demand t
+  :after evil
   :config
   (customize-set-variable
    'evil-textobj-tree-sitter-major-mode-language-alist
@@ -149,7 +151,7 @@
 (use-package projectile
   :custom
   (projectile-project-search-path '(("~/projects/" . 2)))
-  :init
+  :hook (after-init . projectile-mode)
   :config
   (setq projectile-completion-system 'default)
 
@@ -169,9 +171,7 @@
     )
 
   (evil-define-key 'normal 'global
-    (kbd "<leader>p") 'hydra-project/body)
-
-  (projectile-mode +1))
+    (kbd "<leader>p") 'hydra-project/body))
 
 ;; project
 ;; (require 'project)
@@ -307,20 +307,22 @@
 (evil-define-key 'normal 'global (kbd "SPC g") 'hydra-git/body)
 
 (use-package apheleia
+  :hook (after-init . apheleia-global-mode)
   :config
-	;; (dolist (mode '(css-mode
-  ;;                 css-ts-mode
-  ;;                 js-json-mode
-  ;;                 js-mode
-  ;;                 json-mode
-  ;;                 json-ts-mode
-  ;;                 js-ts-mode
-  ;;                 tsx-ts-mode
-  ;;                 typescript-mode
-  ;;                 typescript-ts-mode))
-  ;;   (setf (alist-get mode apheleia-mode-alist) 'biome))
-
-  (apheleia-global-mode +1))
+	;; (setf (alist-get 'biome apheleia-formatters)
+  ;;       '("bunx" "biome" "format"
+  ;;         filepath))
+	(dolist (mode '(css-mode
+                  css-ts-mode
+                  js-json-mode
+                  js-mode
+                  json-mode
+                  json-ts-mode
+                  js-ts-mode
+                  tsx-ts-mode
+                  typescript-mode
+                  typescript-ts-mode))
+    (setf (alist-get mode apheleia-mode-alist) '(biome))))
 
 ;; Automatically make file executable when =shebang= is found.
 (add-hook 'after-save-hook
@@ -329,8 +331,7 @@
 (use-package editorconfig
   :custom
   (editorconfig-exclude-modes '(org-mode))
-  :config
-  (editorconfig-mode 1))
+  :hook (after-init . editorconfig-mode))
 
 (with-eval-after-load 'editorconfig
   (add-to-list 'editorconfig-indentation-alist
@@ -355,8 +356,7 @@
 
 ;; Code folding. TBH, I don't fold my code.
 (use-package origami
-  :config
-  (global-origami-mode))
+  :hook (prog-mode . origami-mode))
 
 (use-package eldoc
   :ensure nil
@@ -382,9 +382,7 @@
   :custom
   (yas-snippet-dirs `(,(expand-file-name "snippets" user-emacs-directory)))
   ;; (yas-snippet-dirs '("~/.config/emacs/snippets"))
-  :config
-  (yas-global-mode 1)
-  )
+  :hook (prog-mode . yas-minor-mode))
 
 (use-package yasnippet-capf
   :after yasnippet
@@ -490,8 +488,8 @@ _c_: continue     _L_: log message     _D_: disconnect
 	;; 		("<escape>" nil "quit" :color blue)
 	;; 		("q" nil "quit" :color blue))
 
-	(evil-define-key 'normal 'global
-		(kbd "<leader>d") 'hydra-debug/body)
+	;; (evil-define-key 'normal 'global
+	;; 	(kbd "<leader> d") 'hydra-debug/body)
 
   ;; Pulse source line (performance hit)
   (add-hook 'dape-display-source-hook #'pulse-momentary-highlight-one-line)
