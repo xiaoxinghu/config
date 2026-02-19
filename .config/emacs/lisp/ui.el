@@ -226,4 +226,6 @@
         `( :mode-line-active 'default
            :mode-line-inactive vertical-border)))
 
+(use-package nerd-icons)
+
 (provide 'ui)
