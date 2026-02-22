@@ -53,4 +53,10 @@
 
 (use-package emacs-everywhere)
 
+(use-package launcher
+  :load-path "~/workspace/launcher.el")
+
+(use-package present
+  :load-path "~/workspace/m-x/elisp")
+
 (provide 'macos)
