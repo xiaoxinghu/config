@@ -11,7 +11,7 @@
 
 (use-package jinx
   ;; :ensure nil
-  ;; :disabled t
+  :disabled t
   :hook ((text-mode prog-mode) . jinx-mode)
   :config
   (setq jinx-languages "en_GB")

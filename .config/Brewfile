@@ -18,6 +18,7 @@ brew "gh"
 brew "bat"
 brew "bat-extras"
 brew "bottom"
+brew "node"
 
 cask "ghostty"
 cask "leader-key"
