@@ -19,6 +19,14 @@
 	:disabled t
 	:ensure nil
 	:config
+	(setq mail-user-agent 'mu4e-user-agent)
+
+	(evil-define-key 'normal 'global
+		(kbd "<leader>e") '("help" . mu4e))
+
+	;; https://pragmaticemacs.wordpress.com/2016/03/22/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
+	(setq mu4e-change-filenames-when-moving t)
+
 	(setq
 	 mu4e-maildir (expand-file-name "~/Mail")
 	 mu4e-refile-folder "/Archive"
@@ -50,7 +58,41 @@
 					("date:7d..now AND NOT flag:trashed" "Last 7 days" ?w)
 					)))
 
-(setq mail-user-agent 'mu4e-user-agent)
+(use-package mu4e-views
+	:after mu4e
+	:defer nil
+  :vc (:url "https://github.com/lordpretzel/mu4e-views" :rev :newest)
+  :bind (:map mu4e-headers-mode-map
+							("v" . mu4e-views-mu4e-select-view-msg-method) ;; choose view method
+							("M-n" . mu4e-views-cursor-msg-view-window-down)
+							("M-p" . mu4e-views-cursor-msg-view-window-up)
+							("f" . mu4e-views-toggle-auto-view-selected-message)
+							("i" . mu4e-views-mu4e-view-as-nonblocked-html))
+  :config
+  (setq mu4e-views-default-view-method "html-nonblock")
+  (mu4e-views-mu4e-use-view-msg-method "html-nonblock")
+  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
+  (setq mu4e-views-auto-view-selected-message t))
+
+(use-package notmuch
+	:disabled t
+	;; :config
+	;; (setq notmuch-hello-sections
+	;; 			'(
+	;; 				notmuch-hello-insert-header
+	;; 				notmuch-hello-insert-saved-searches
+	;; 				notmuch-hello-insert-alltags
+	;; 				notmuch-hello-insert-recent-messages
+	;; 				))
+	;; (setq notmuch-saved-searches
+	;; 			'(
+	;; 				("inbox" . "tag:inbox AND tag:unread")
+	;; 				("unread" . "tag:unread")
+	;; 				("flagged" . "tag:flagged")
+	;; 				("today" . "date:today..now")
+	;; 				("last 7 days" . "date:7d..now")
+	;; 				))
+	)
 
 (use-package org-msg
 	:disabled t
@@ -72,9 +114,6 @@
  #+end_signature")
 	(org-msg-mode))
 
-(use-package mu4e-views
-	:disabled t
-  :vc (:fetcher github :repo lordpretzel/mu4e-views))
 
 (use-package eaf
   :vc (:fetcher github :repo emacs-eaf/emacs-application-framework)
@@ -96,5 +135,18 @@
 ;; 	(auth-source-pass-enable))
 
 (use-package password-store)
+;; (use-package doing
+;; 	:vc (:url "https://github.com/xiaoxinghu/doing.el" :rev :newest))
+
+(use-package doing
+  :load-path "~/workspace/doing.el"
+	:custom
+	(doing-directory my/org-location)
+	(evil-define-key 'normal 'global
+		(kbd "<leader>d") doing-command-map)
+	)
+
+(use-package links
+  :load-path "~/workspace/links.el")
 
 (provide 'tools)
