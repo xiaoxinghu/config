@@ -309,9 +309,12 @@
 (use-package apheleia
   :hook (after-init . apheleia-global-mode)
   :config
-	;; (setf (alist-get 'biome apheleia-formatters)
-  ;;       '("bunx" "biome" "format"
-  ;;         filepath))
+  ;; Use the modern Biome package explicitly, and keep formatting working
+  ;; while the buffer has temporary syntax errors during edits.
+  (setf (alist-get 'biome apheleia-formatters)
+        '("bunx" "--bun" "@biomejs/biome" "format"
+          "--format-with-errors=true"
+          "--stdin-file-path" filepath))
 	(dolist (mode '(css-mode
                   css-ts-mode
                   js-json-mode
