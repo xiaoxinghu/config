@@ -19,6 +19,8 @@ brew "bat"
 brew "bat-extras"
 brew "bottom"
 brew "node"
+brew "1password-cli"
+brew "fzf"
 
 cask "ghostty"
 cask "leader-key"

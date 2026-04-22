@@ -95,8 +95,10 @@ bindkey '^[[B' history-substring-search-down
 
 # load bun completions
 if (( $+commands[bun] )); then
-  [ -s ~/.bun/_bun ] || bun completions
-	fpath+=~/.bun/
+  [ -s ~/.bun/_bun ] || bun completions >| ~/.bun/_bun
+  mkdir -p ~/.local/share/zsh/site-functions
+  cp ~/.bun/_bun ~/.local/share/zsh/site-functions/_bun
+  fpath+=(~/.local/share/zsh/site-functions)
 fi
 
 # autocompletion via carapace
@@ -104,9 +106,8 @@ export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 source <(carapace _carapace)
 
-# bun completions
-[ -s "/Users/Xiaoxing.Hu@nib.co.nz/.bun/_bun" ] && source "/Users/Xiaoxing.Hu@nib.co.nz/.bun/_bun"
-
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+eval "$(mise activate zsh)"
