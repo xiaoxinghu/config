@@ -2,7 +2,7 @@
 	email = hi@xiaoxing.dev
 	name = Xiaoxing Hu
 [pull]
-	rebase = true
+	rebase = false
 [init]
 	defaultBranch = main
 [github]
