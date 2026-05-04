@@ -9,6 +9,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+fpath=(~/.config/zsh/functions $fpath)
+autoload -Uz ~/.config/zsh/functions/*(N:t)
+
 autoload -Uz compinit
 compinit -C
 zmodload zsh/complist
@@ -111,3 +114,12 @@ export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 eval "$(mise activate zsh)"
+
+zedz() {
+  local dir
+  dir="$(zoxide query -i "$@")" || return
+  zed "$dir"
+}
+
+# Machine-local config (secrets, per-host tweaks). Not tracked.
+[[ -f ~/.config/zsh/local.zsh ]] && source ~/.config/zsh/local.zsh
