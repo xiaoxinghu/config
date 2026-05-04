@@ -8,9 +8,12 @@ dir="$(
     done |
     fzf \
       --prompt='repo > ' \
-      --preview='git -C {} status --short --branch'
+      --preview='git -C {} status --short --branch' \
+      --preview-window=down:50%
 )" || return
 [[ -z "$dir" ]] && return
+
+zoxide add "$dir"
 
 print -n 'action: (z)ed  (g)lazygit  (o)rigin  (t)mux  (q)uit > '
 local key
