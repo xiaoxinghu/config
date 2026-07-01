@@ -1,0 +1,38 @@
+emulate -L zsh
+
+local dir
+dir="$(
+  zoxide query -l |
+    while read -r path; do
+      [[ -d "$path/.git" ]] && printf '%s\n' "$path"
+    done |
+    fzf \
+      --prompt='repo > ' \
+      --preview='git -C {} status --short --branch' \
+      --preview-window=down:50%
+)" || return
+[[ -z "$dir" ]] && return
+
+zoxide add "$dir"
+
+print -n 'action: (z)ed  (g)lazygit  (o)rigin  (t)mux  (q)uit > '
+local key
+read -sk1 key
+print
+
+case "$key" in
+  z) zed "$dir" ;;
+  g) lazygit -p "$dir" ;;
+  o) ( cd "$dir" && gh browse ) ;;
+  t)
+    local name="${${dir:t}//[.:]/_}"
+    tmux has-session -t "=$name" 2>/dev/null || tmux new-session -ds "$name" -c "$dir"
+    if [[ -n "$TMUX" ]]; then
+      tmux switch-client -t "$name"
+    else
+      tmux attach -t "$name"
+    fi
+    ;;
+  q|$'\e') ;;
+  *) print "repo: unknown key '$key'" >&2; return 1 ;;
+esac
