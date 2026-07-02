@@ -1,0 +1,36 @@
+[user]
+	email = hi@xiaoxing.dev
+	name = Xiaoxing Hu
+[pull]
+	rebase = false
+[init]
+	defaultBranch = main
+[github]
+	user = xiaoxinghu
+[safe]
+	directory = /usr/local
+
+[core]
+	pager = hunk pager
+
+[interactive]
+    diffFilter = delta --color-only
+[add.interactive]
+    useBuiltin = false # required for git 2.37.0
+
+[merge]
+    conflictstyle = diff3
+
+[difftool]
+    # Run the difftool immediately, don't ask 'are you sure' each time.
+    prompt = false
+[pager]
+    # Use a pager if the difftool output is larger than one screenful,
+    # consistent with the behaviour of `git diff`.
+    difftool = true
+[rerere]
+	enabled = 1
+	autoupdate = true
+
+[credential]
+	helper = "osxkeychain"
