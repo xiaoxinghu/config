@@ -13,6 +13,7 @@ zoxide = "latest"
 direnv = "latest"
 carapace = "latest"
 neovim = "latest"
+tree-sitter = "latest"   # treesitter CLI; required by nvim-treesitter (main branch)
 ripgrep = "latest"
 lazygit = "latest"
 hunk = "latest"
