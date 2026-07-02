@@ -1,0 +1,7 @@
+# Zsh plugins, managed by antidote (https://antidote.sh).
+# One `owner/repo` per line. .zshrc rebuilds a static bundle from this file
+# whenever it changes. Works identically on macOS and Linux.
+
+romkatv/powerlevel10k
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-history-substring-search

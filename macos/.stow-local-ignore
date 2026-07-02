@@ -1,0 +1,30 @@
+# Stow ignore list for the macos package.
+# NOTE: this file replaces stow's built-in defaults, so they're repeated below.
+
+# Provisioning metadata, not a dotfile to symlink
+^/Brewfile$
+
+# --- stow defaults ---
+RCS
+.+,v
+
+CVS
+\.\#.+
+\.cvsignore
+
+\.svn
+_darcs
+\.hg
+
+\.git
+\.gitignore
+\.gitmodules
+
+.+~
+\#.*\#
+
+^/README.*
+^/LICENSE.*
+^/COPYING
+
+bootstrap.sh

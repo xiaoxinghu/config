@@ -9,6 +9,13 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Platform-specific config (macos/ or linux/ provides ~/.config/zsh/platform.zsh).
+[[ -r ${ZDOTDIR:-$HOME}/platform.zsh ]] && source ${ZDOTDIR:-$HOME}/platform.zsh
+
+# Activate mise early so its tools (zoxide, direnv, carapace, eza, node, …) are
+# on PATH for the rest of this file.
+command -v mise >/dev/null && eval "$(mise activate zsh)"
+
 fpath=(~/.config/zsh/functions $fpath)
 autoload -Uz ~/.config/zsh/functions/*(N:t)
 
@@ -20,8 +27,25 @@ zstyle ':completion:*' menu select
 # (Optional) Jump straight into the menu on first Tab
 bindkey '^I' menu-select   # ^I is Tab
 
-# Powerlevel10k theme
-source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
+# ============================================================================
+# Zsh plugins via antidote (cross-platform; replaces the Homebrew formulae).
+# Clones antidote + plugins into XDG data dir, rebuilds a static bundle into the
+# cache dir only when .zsh_plugins.txt changes, then sources it. Loads the
+# powerlevel10k theme; ~/.config/zsh/.p10k.zsh below applies its config.
+# ============================================================================
+export ANTIDOTE_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/antidote/plugins"
+antidote_src="${XDG_DATA_HOME:-$HOME/.local/share}/antidote/src"
+[[ -e $antidote_src/antidote.zsh ]] ||
+  git clone --depth=1 https://github.com/mattmc3/antidote.git "$antidote_src"
+source "$antidote_src/antidote.zsh"
+
+zsh_plugins_txt="${ZDOTDIR:-$HOME}/.zsh_plugins.txt"
+zsh_plugins_zsh="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zsh_plugins.zsh"
+if [[ ! $zsh_plugins_zsh -nt $zsh_plugins_txt ]]; then
+  mkdir -p "${zsh_plugins_zsh:h}"
+  antidote bundle <"$zsh_plugins_txt" >"$zsh_plugins_zsh"
+fi
+source "$zsh_plugins_zsh"
 
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.config/zsh/.histfile
@@ -59,12 +83,7 @@ alias ta="tmux a"
 alias s='sesh connect "$(sesh list | gum filter --limit 1 --placeholder "Pick a sesh" --prompt="⚡")"'
 alias g="lazygit"
 alias e="emacsclient"
-alias love="/Applications/LOVE.app/Contents/MacOS/love"
 alias man="batman"
-
-if type brew &>/dev/null; then
-		FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-fi
 
 # ============================================================================
 # 4. Initialize completions FIRST
@@ -89,11 +108,7 @@ GITSTATUS_LOG_LEVEL=DEBUG
 eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
 
-# --- plugins ---
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
-
-# --- key binds ---
+# --- key binds (history-substring-search; plugin loaded via antidote above) ---
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
@@ -109,8 +124,6 @@ fi
 export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
 zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
 source <(carapace _carapace)
-
-eval "$(mise activate zsh)"
 
 zedz() {
   local dir

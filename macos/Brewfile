@@ -1,30 +1,20 @@
-tap "d12frosted/emacs-plus"
+# macOS-only packages. Cross-platform CLI tools live in mise
+# (see shared/.config/mise/config.toml) and zsh plugins/prompt in antidote
+# (see shared/.config/zsh/.zsh_plugins.txt). Keep here only what those can't
+# manage: mise itself, system tools, and GUI apps.
 
-brew "eza"
-brew "powerlevel10k"
-brew "zoxide"
-brew "direnv"
-brew "carapace"
-brew "neovim"
-brew "tmux"
-brew "ripgrep"
-brew "lazygit"
-brew "zsh-history-substring-search"
-brew "pass"
-brew "zsh-autosuggestions"
-brew "git"
-brew "awscli"
-brew "gh"
-brew "bat"
-brew "bat-extras"
-brew "bottom"
-brew "node"
-brew "1password-cli"
-brew "fzf"
+tap "d12frosted/emacs-plus", trusted: true
+
+# mise (installs the cross-platform tools; via curl on Linux)
 brew "mise"
-brew "gum"
-brew "sesh"
 
+# system tools
+brew "git"
+brew "tmux"
+brew "stow"
+brew "pass"
+
+# GUI apps + fonts
 cask "ghostty"
 cask "leader-key"
 cask "rectangle"
@@ -33,4 +23,5 @@ cask "resilio-sync"
 cask "font-jetbrains-mono-nerd-font"
 cask "font-hack-nerd-font"
 
+# built from source (no prebuilt arm64 binary); pairs with emacs above
 cargo "emacs-lsp-booster"

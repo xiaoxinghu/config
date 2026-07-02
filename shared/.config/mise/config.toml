@@ -1,0 +1,26 @@
+# Cross-platform CLI tools + runtimes, managed by mise.
+# Stowed to ~/.config/mise/config.toml and installed by setup.sh (`mise install`).
+# Platform-bound things (GUI apps, the shell + its plugins, system tools) live in
+# macos/Brewfile and linux/bootstrap.sh instead.
+
+[tools]
+# runtimes
+node = "lts"
+
+# cli tools
+eza = "latest"
+zoxide = "latest"
+direnv = "latest"
+carapace = "latest"
+neovim = "latest"
+ripgrep = "latest"
+lazygit = "latest"
+bat = "latest"
+bat-extras = "latest"
+bottom = "latest"
+fzf = "latest"
+gum = "latest"
+gh = "latest"
+awscli = "latest"
+"github:joshmedeski/sesh" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
