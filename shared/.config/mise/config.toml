@@ -24,3 +24,10 @@ gh = "latest"
 awscli = "latest"
 "github:joshmedeski/sesh" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
+
+# language servers (editor-agnostic; used by eglot etc.)
+# tsls has no runtime `typescript` dep, so install it too; point eglot at it
+# via tsserver.path -> ~/.local/share/mise/installs/npm-typescript/latest/lib/node_modules/typescript/lib
+"npm:typescript-language-server" = "latest"
+"npm:typescript" = "latest"
+pnpm = "11.2.2"
