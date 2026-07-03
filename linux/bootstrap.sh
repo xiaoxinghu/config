@@ -115,8 +115,24 @@ else
 fi
 
 # ----- setup -----
+# setup.sh runs as $USERNAME and needs sudo (system packages). We're root and
+# just created this user, so grant passwordless sudo for the duration of setup,
+# then revoke it. Keeps the piped bootstrap non-interactive without weakening
+# sudo permanently; a user running setup.sh standalone still gets prompted.
 echo "Running setup.sh as '$USERNAME'..."
-sudo -u "$USERNAME" bash -c "cd '$DEST' && ./setup.sh"
+sudoers="/etc/sudoers.d/99-obento-setup"
+printf '%s ALL=(ALL) NOPASSWD:ALL\n' "$USERNAME" >"$sudoers"
+chmod 0440 "$sudoers"
+trap 'rm -f "$sudoers"' EXIT
+# Give setup.sh the terminal as stdin (bootstrap's own stdin is the curl pipe),
+# so interactive steps inside it (e.g. `gh auth login --web`) can prompt you.
+if [[ -r /dev/tty ]]; then
+  sudo -u "$USERNAME" bash -c "cd '$DEST' && ./setup.sh" </dev/tty
+else
+  sudo -u "$USERNAME" bash -c "cd '$DEST' && ./setup.sh"
+fi
+rm -f "$sudoers"
+trap - EXIT
 
 # ----- default shell -----
 # setup.sh (via linux/setup.sh) has now installed zsh; make it the login shell.
