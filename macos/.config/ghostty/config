@@ -1,0 +1,16 @@
+# Ghostty configuration (macOS). Symlinked to ~/.config/ghostty/config by stow.
+# Full reference: https://ghostty.org/docs/config
+
+# Prepare remote hosts for Ghostty over SSH. Fixes garbled input (one keypress
+# echoing as several) and missing styling that happen when the remote lacks the
+# xterm-ghostty terminfo entry:
+#   ssh-terminfo  installs Ghostty's terminfo on first connect (falls back to
+#                 xterm-256color if `tic` is unavailable on the remote).
+#   ssh-env       forwards COLORTERM / TERM_PROGRAM so the remote detects Ghostty.
+# Omitted features (cursor, title, path) keep their defaults.
+shell-integration-features = ssh-env,ssh-terminfo
+
+# Pick and connect to a sesh session/directory via tmux popup.
+# Sends tmux prefix (Ctrl-b) then K; tmux.conf owns the actual command.
+# Overrides default Cmd+K clear-screen binding.
+keybind = super+k=text:\x02K

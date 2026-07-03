@@ -2,6 +2,17 @@
 # Environment variables sourced by all zsh instances (login, interactive,
 # scripts). Bootstrapped from ~/.zshenv.
 
+# TERM fallback for Ghostty over SSH. Ghostty advertises TERM=xterm-ghostty,
+# which ssh forwards to the remote. Most servers (and pre-6.5 ncurses distros
+# like current Ubuntu) lack that terminfo entry; without it zsh's line editor
+# emits the wrong key sequences (one keypress echoes as several) and prompt
+# styling breaks. If the entry is missing on this machine, fall back to a
+# widely-known TERM so the shell stays usable. Auto-disables once the
+# xterm-ghostty terminfo entry is installed (e.g. via Ghostty's ssh-terminfo).
+if [[ $TERM == xterm-ghostty ]] && ! infocmp xterm-ghostty &>/dev/null; then
+  export TERM=xterm-256color
+fi
+
 # PATH — Homebrew (Apple Silicon / Intel)
 if [[ -d "/opt/homebrew/bin" ]]; then
     export PATH="/opt/homebrew/bin:$PATH"
