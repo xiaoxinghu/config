@@ -6,7 +6,9 @@
          :user "api-key"))
 
 (setenv "GEMINI_API_KEY"
-        "AIzaSyA8T7DMKdoz3owJWSykinYi5fOZ1DmAc38")
+        (auth-source-pick-first-password
+         :host "gemini"
+         :user "api-key"))
 
 ;;; Commentary:
 ;; Configuration for various AI assistants and code completion tools in Emacs.
