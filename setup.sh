@@ -12,9 +12,9 @@ case "$(uname -s)" in
   *) echo "Unsupported OS: $(uname -s)" >&2; exit 1 ;;
 esac
 
-# ----- bootstrap -----
-if [[ -x "$REPO/$PLATFORM/bootstrap.sh" ]]; then
-  "$REPO/$PLATFORM/bootstrap.sh"
+# ----- setup platform -----
+if [[ -x "$REPO/$PLATFORM/setup.sh" ]]; then
+  "$REPO/$PLATFORM/setup.sh"
 fi
 
 # ----- config -----

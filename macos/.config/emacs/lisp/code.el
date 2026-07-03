@@ -99,7 +99,7 @@
          (typescript-ts-mode . combobulate-mode)
          (html-ts-mode . combobulate-mode)
          )
-  ;; :load-path ("~/system/emacs/packages/combobulate")
+  ;; :load-path ("~/config/emacs/packages/combobulate")
   )
 
 (use-package evil-textobj-tree-sitter
