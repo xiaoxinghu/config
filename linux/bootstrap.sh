@@ -5,7 +5,7 @@
 # interactive input from /dev/tty (not stdin), so `curl ... | bash` works.
 #
 # Usage (from a root shell):
-#   curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/config/main/linux/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/obento/main/linux/bootstrap.sh | bash
 # With sudo:
 #   curl -fsSL <url> | sudo bash
 # Non-interactive (provide the user up front, keeps env with -E):
@@ -15,15 +15,15 @@
 #   1. installs the bare minimum to proceed (git + sudo),
 #   2. creates the requested user (in the sudo/wheel group) if missing,
 #      copying root's authorized_keys and setting a password,
-#   3. clones this config repo into the user's home (or updates it),
+#   3. clones this obento repo into the user's home (or updates it),
 #   4. runs setup.sh as that user.
 # Idempotent: re-run any time to converge the machine to the desired state.
 set -euo pipefail
 
 # Overridable via environment.
-REPO_URL="${REPO_URL:-https://github.com/xiaoxinghu/config.git}"
+REPO_URL="${REPO_URL:-https://github.com/xiaoxinghu/obento.git}"
 # XDG data home convention (chezmoi uses ~/.local/share/chezmoi, yadm ~/.local/share/yadm).
-CONFIG_SUBPATH="${CONFIG_SUBPATH:-.local/share/config}"
+CONFIG_SUBPATH="${CONFIG_SUBPATH:-.local/share/obento}"
 USERNAME="${USERNAME:-}"
 export DEBIAN_FRONTEND=noninteractive
 
