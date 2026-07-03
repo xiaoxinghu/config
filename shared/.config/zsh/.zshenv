@@ -23,3 +23,6 @@ export PATH="$HOME/.bun/bin:$PATH"
 
 # Rust / Cargo
 [[ -d "$HOME/.cargo" ]] && . "$HOME/.cargo/env"
+
+# Machine-local env (e.g. OBENTO_PATH, written by setup.sh). Not tracked.
+[[ -f "${ZDOTDIR:-$HOME/.config/zsh}/local.zshenv" ]] && source "${ZDOTDIR:-$HOME/.config/zsh}/local.zshenv"

@@ -9,3 +9,19 @@ Like a bento, it's opinionated and pre-portioned: run the bootstrap and your mac
 ```sh
 curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/obento/main/linux/bootstrap.sh | bash
 ```
+
+## Usage
+
+After setup, the `obento` command is on your `PATH` (and `$OBENTO_PATH` points
+at this repo):
+
+```sh
+obento update            # git pull + re-run setup.sh (aborts on conflicts)
+obento add <path>        # move a config into the current platform and stow it
+```
+
+Example:
+
+```sh
+obento add ~/.config/seth/seth.toml
+```

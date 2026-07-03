@@ -24,6 +24,17 @@ pkgs=(shared)
 echo "Stowing: ${pkgs[*]} -> $HOME"
 stow --dir="$REPO" --target="$HOME" --restow --verbose "${pkgs[@]}"
 
+# ----- expose repo location -----
+# Persist $OBENTO_PATH so the `obento` command (and anything else) can find this
+# repo regardless of cwd. Written to a machine-local, untracked zshenv that
+# ~/.config/zsh/.zshenv sources. Idempotent: the OBENTO_PATH line is rewritten.
+local_env="$HOME/.config/zsh/local.zshenv"
+install -d "$(dirname "$local_env")"
+tmp="$(mktemp)"
+[[ -f "$local_env" ]] && grep -v '^export OBENTO_PATH=' "$local_env" >"$tmp" || true
+printf 'export OBENTO_PATH=%q\n' "$REPO" >>"$tmp"
+mv "$tmp" "$local_env"
+
 # ----- tools -----
 # Cross-platform CLI tools are declared in shared/.config/mise/config.toml,
 # which stow just linked to ~/.config/mise/config.toml. Install them.
