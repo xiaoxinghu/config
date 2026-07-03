@@ -21,6 +21,11 @@ fi
 pkgs=(shared)
 [[ -d "$REPO/$PLATFORM" ]] && pkgs+=("$PLATFORM")
 
+# Make ~/.local/bin a real dir before stow, so stow can't fold ~/.local into a
+# single symlink into the repo (that would swallow ~/.local/share/obento and
+# mise's ~/.local/{bin,share}). The obento command lives in shared/.local/bin.
+install -d "$HOME/.local/bin"
+
 echo "Stowing: ${pkgs[*]} -> $HOME"
 stow --dir="$REPO" --target="$HOME" --restow --verbose "${pkgs[@]}"
 

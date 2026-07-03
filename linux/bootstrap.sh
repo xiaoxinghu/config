@@ -16,7 +16,8 @@
 #   2. creates the requested user (in the sudo/wheel group) if missing,
 #      copying root's authorized_keys and setting a password,
 #   3. clones this obento repo into the user's home (or updates it),
-#   4. runs setup.sh as that user.
+#   4. runs setup.sh as that user,
+#   5. sets zsh as that user's login shell.
 # Idempotent: re-run any time to converge the machine to the desired state.
 set -euo pipefail
 
@@ -116,5 +117,14 @@ fi
 # ----- setup -----
 echo "Running setup.sh as '$USERNAME'..."
 sudo -u "$USERNAME" bash -c "cd '$DEST' && ./setup.sh"
+
+# ----- default shell -----
+# setup.sh (via linux/setup.sh) has now installed zsh; make it the login shell.
+# We're still root here, so chsh needs no password. Idempotent.
+ZSH_BIN="$(command -v zsh || true)"
+if [[ -n "$ZSH_BIN" ]]; then
+  grep -qxF "$ZSH_BIN" /etc/shells 2>/dev/null || echo "$ZSH_BIN" >> /etc/shells
+  chsh -s "$ZSH_BIN" "$USERNAME"
+fi
 
 echo "Done. Log in as '$USERNAME' to start using the machine."
