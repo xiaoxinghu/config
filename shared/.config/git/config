@@ -31,6 +31,3 @@
 [rerere]
 	enabled = 1
 	autoupdate = true
-
-[credential]
-	helper = "osxkeychain"

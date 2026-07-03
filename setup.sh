@@ -27,8 +27,25 @@ stow --dir="$REPO" --target="$HOME" --restow --verbose "${pkgs[@]}"
 # ----- tools -----
 # Cross-platform CLI tools are declared in shared/.config/mise/config.toml,
 # which stow just linked to ~/.config/mise/config.toml. Install them.
-export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+# Include the mise shims dir so mise-managed tools (gh, …) resolve below.
+export PATH="$HOME/.local/bin:${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims:/opt/homebrew/bin:/usr/local/bin:$PATH"
 if command -v mise >/dev/null 2>&1; then
   echo "Installing tools with mise..."
   mise install -y
+fi
+
+# ----- github ssh key -----
+# Give this machine its own SSH key on GitHub (per-machine, never shared). The
+# first run does a one-time web/device login; re-runs skip whatever is already
+# in place. Needs gh (from mise, above), so this stays after `mise install`.
+if command -v gh >/dev/null 2>&1; then
+  key="$HOME/.ssh/id_ed25519"
+  gh auth status >/dev/null 2>&1 ||
+    gh auth login --hostname github.com --git-protocol ssh --skip-ssh-key --web || true
+  if gh auth status >/dev/null 2>&1; then
+    install -d -m 700 "$HOME/.ssh"
+    [[ -f "$key" ]] || ssh-keygen -t ed25519 -N '' -C "$(whoami)@$(hostname)" -f "$key"
+    pub="$(awk '{print $2}' "$key.pub")"
+    gh ssh-key list 2>/dev/null | grep -qF "$pub" || gh ssh-key add "$key.pub" --title "$(hostname)"
+  fi
 fi
