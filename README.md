@@ -6,6 +6,14 @@ Like a bento, it's opinionated and pre-portioned: run the bootstrap and your mac
 
 ## Setup
 
+macOS (run as your normal user):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/obento/main/macos/bootstrap.sh | bash
+```
+
+Linux (run from a root shell):
+
 ```sh
 curl -fsSL https://raw.githubusercontent.com/xiaoxinghu/obento/main/linux/bootstrap.sh | bash
 ```
