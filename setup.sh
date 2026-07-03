@@ -56,20 +56,25 @@ fi
 # in place. Needs gh (from mise, above), so this stays after `mise install`.
 if command -v gh >/dev/null 2>&1; then
   key="$HOME/.ssh/id_ed25519"
-  # Registering the machine's SSH key needs the admin:public_key scope, which
-  # gh's default web login does NOT grant, so request it explicitly.
-  gh auth status >/dev/null 2>&1 ||
-    gh auth login --hostname github.com --git-protocol ssh --skip-ssh-key --web -s admin:public_key || true
-  # Already authed but missing the scope (e.g. an older session)? Ask for it.
-  if gh auth status >/dev/null 2>&1 && ! gh ssh-key list >/dev/null 2>&1; then
-    gh auth refresh --hostname github.com -s admin:public_key || true
+  # If gh is already authenticated, leave that session alone. Only start the
+  # one-time login on a fresh machine, and only when running interactively.
+  if ! gh auth status >/dev/null 2>&1; then
+    if [[ -t 0 ]]; then
+      gh auth login --hostname github.com --git-protocol ssh --skip-ssh-key --web -s admin:public_key || true
+    else
+      echo "warning: gh is not authenticated; skipping GitHub SSH key registration" >&2
+    fi
   fi
   if gh auth status >/dev/null 2>&1; then
-    install -d -m 700 "$HOME/.ssh"
-    [[ -f "$key" ]] || ssh-keygen -t ed25519 -N '' -C "$(whoami)@$(hostname)" -f "$key"
-    pub="$(awk '{print $2}' "$key.pub")"
-    gh ssh-key list 2>/dev/null | grep -qF "$pub" ||
-      gh ssh-key add "$key.pub" --title "$(hostname)" ||
-      echo "warning: could not add SSH key to GitHub (needs admin:public_key scope)" >&2
+    if gh ssh-key list >/dev/null 2>&1; then
+      install -d -m 700 "$HOME/.ssh"
+      [[ -f "$key" ]] || ssh-keygen -t ed25519 -N '' -C "$(whoami)@$(hostname)" -f "$key"
+      pub="$(awk '{print $2}' "$key.pub")"
+      gh ssh-key list 2>/dev/null | grep -qF "$pub" ||
+        gh ssh-key add "$key.pub" --title "$(hostname)" ||
+        echo "warning: could not add SSH key to GitHub" >&2
+    else
+      echo "warning: gh is authenticated but cannot list SSH keys; skipping GitHub SSH key registration" >&2
+    fi
   fi
 fi
