@@ -25,6 +25,7 @@ fzf = "latest"
 gum = "latest"
 gh = "latest"
 awscli = "latest"
+herdr = "latest"           # agent multiplexer (herdr.dev)
 "github:joshmedeski/sesh" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 
