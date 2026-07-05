@@ -8,6 +8,7 @@
 node = "lts"
 
 # cli tools
+fd = "latest"
 eza = "latest"
 zoxide = "latest"
 direnv = "latest"
